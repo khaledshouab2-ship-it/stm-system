@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>STM | نظام إدارة الرسوم والطلاب (الإصدار المطور v2)</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --panel-bg: #1e1e1e;
+            --text-color: #ffffff;
+            --text-muted: #aaaaaa;
+            --accent-color: #007acc;
+            --accent-hover: #0098ff;
+            --border-color: #333333;
+            --success-color: #00ff66;
+            --danger-color: #ff3333;
+            --warning-color: #ffc107;
+        }
+        .light-theme {
+            --bg-color: #f4f6f9;
+            --panel-bg: #ffffff;
+            --text-color: #333333;
+            --text-muted: #666666;
+            --accent-color: #0056b3;
+            --accent-hover: #004085;
+            --border-color: #cccccc;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --warning-color: #e0a800;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-color); transition: background 0.3s, color 0.3s; padding: 20px; }
+        .header-container { display: flex; justify-content: space-between; align-items: center; background: var(--panel-bg); padding: 15px 20px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+        .master-header { font-family: 'Consolas', monospace; color: var(--text-muted); font-size: 13px; }
+        .dynamic-header { font-size: 20px; font-weight: bold; color: var(--success-color); }
+        
+        /* Gateway/Login Lock */
+        .gateway-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--bg-color); display: flex; justify-content: center; align-items: center; z-index: 9999; }
+        .gateway-card { background: var(--panel-bg); padding: 40px; border-radius: 12px; border: 1px solid var(--border-color); text-align: center; width: 400px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .gateway-card h2 { margin-bottom: 20px; color: var(--accent-color); }
+        .form-group { margin-bottom: 14px; text-align: right; }
+        .form-group label { display: block; margin-bottom: 5px; color: var(--text-muted); font-size: 14px; }
+        .form-control { width: 100%; padding: 9px 12px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-color); font-size: 15px; }
+        .gateway-card .form-control { text-align: center; }
+        .btn { padding: 9px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; font-size: 14px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+        .btn-accent { background: var(--accent-color); color: white; }
+        .btn-accent:hover { background: var(--accent-hover); }
+        .btn-danger { background: var(--danger-color); color: white; }
+        .btn-danger:hover { opacity: 0.9; }
+        .btn-success { background: var(--success-color); color: #000; }
+        .light-theme .btn-success { color: #fff; }
+        .btn-warning { background: var(--warning-color); color: #000; }
+        .btn-print { background: #6f42c1; color: white; }
+        .btn-print:hover { background: #59339d; }
+        
+        /* Tabs Dashboard */
+        .dashboard-layout { display: none; }
+        .tabs-nav { display: flex; gap: 10px; background: var(--panel-bg); padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 20px; flex-wrap: wrap; }
+        .tab-btn { background: transparent; border: none; color: var(--text-muted); padding: 10px 18px; font-size: 15px; cursor: pointer; font-weight: bold; border-radius: 6px; transition: 0.2s; }
+        .tab-btn.active { background: var(--accent-color); color: white; }
+        .tab-content { display: none; background: var(--panel-bg); padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); }
+        .tab-content.active { display: block; }
+        
+        /* Grid Management layouts */
+        .main-grid { display: grid; grid-template-columns: 2.3fr 1fr; gap: 20px; }
+        @media(max-width: 900px) { .main-grid { grid-template-columns: 1fr; } }
+
+        /* Search & Filter Toolbar */
+        .toolbar { display: flex; gap: 10px; flex-wrap: wrap; background: var(--bg-color); padding: 12px; border-radius: 6px; border: 1px solid var(--border-color); margin-bottom: 15px; align-items: center; }
+        .toolbar input, .toolbar select { padding: 8px 12px; border-radius: 5px; border: 1px solid var(--border-color); background: var(--panel-bg); color: var(--text-color); font-size: 14px; }
+        .toolbar input { flex: 1; min-width: 180px; }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px; }
+        .badge-count { background: var(--accent-color); color: white; padding: 2px 10px; border-radius: 12px; font-size: 13px; margin-right: 6px; }
+        
+        /* Tables Styles */
+        .table-container { overflow-x: auto; max-height: 480px; overflow-y: auto; background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 6px; }
+        table { width: 100%; border-collapse: collapse; text-align: right; }
+        th, td { padding: 10px 12px; border-bottom: 1px solid var(--border-color); font-size: 14px; }
+        th { background: var(--panel-bg); color: var(--text-color); position: sticky; top: 0; z-index: 2; }
+        tr:hover { background: rgba(255,255,255,0.05); }
+        .light-theme tr:hover { background: rgba(0,0,0,0.02); }
+        
+        /* Action row styles */
+        .action-btns { display: flex; gap: 5px; }
+        .action-btn { padding: 4px 8px; font-size: 12px; border-radius: 4px; border: none; cursor: pointer; color: white; font-weight: bold; }
+        .edit-btn { background: #ffc107; color: black; }
+        .delete-btn { background: var(--danger-color); }
+        
+        /* Audit/Reporting Stats Widget */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .stat-card { padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); text-align: center; }
+        .stat-card.collected { background: rgba(0, 255, 102, 0.1); border-color: var(--success-color); }
+        .stat-card.arrears { background: rgba(255, 51, 51, 0.1); border-color: var(--danger-color); }
+        .stat-card.info { background: rgba(0, 122, 204, 0.1); border-color: var(--accent-color); }
+        .stat-card h3 { font-size: 14px; color: var(--text-muted); margin-bottom: 8px; }
+        .stat-card p { font-size: 24px; font-weight: bold; }
+
+        /* Danger Zone Box */
+        .danger-zone { border: 1px solid var(--danger-color); background: rgba(255, 51, 51, 0.05); padding: 18px; border-radius: 8px; margin-top: 25px; }
+        .danger-zone h3 { color: var(--danger-color); margin-bottom: 10px; }
+        .danger-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+        @media(max-width: 600px) { .danger-actions { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+    <!-- Gateway Security Panel -->
+    <div id="gatewayLock" class="gateway-overlay">
+        <div class="gateway-card">
+            <h2>بوابة العبور الآمنة | STM</h2>
+            <div class="form-group">
+                <label>نوع الحساب:</label>
+                <select id="loginRole" class="form-control" style="background: var(--panel-bg);">
+                    <option value="master">مدير النظام الفائق (Master)</option>
+                    <option value="user">مستخدم عادي (Staff)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>كلمة المرور السريّة:</label>
+                <input type="password" id="loginPassword" class="form-control" placeholder="••••••••" onkeypress="if(event.key==='Enter') attemptLogin()">
+            </div>
+            <button class="btn btn-accent" style="width:100%;" onclick="attemptLogin()">تحقق وتأكيد الدخول</button>
+        </div>
+    </div>
+
+    <!-- Main App Content -->
+    <div id="appDashboard" class="dashboard-layout">
+        <div class="header-container">
+            <div class="master-header">STM | TEL: 00201000009721 | Email: khaledshouab2@gmail.com</div>
+            <div>
+                <button class="btn" style="background: var(--border-color); color: var(--text-color); margin-left:10px; font-size:12px;" onclick="toggleTheme()">🌓 تبديل النمط</button>
+                <button class="btn btn-danger" style="font-size:12px; padding:6px 12px;" onclick="logout()">خروج آمن 🚪</button>
+            </div>
+            <div class="dynamic-header" id="dynamicCenterHeader">مركز التميز التعليمي</div>
+        </div>
+
+        <!-- Navigation Tabs Bar -->
+        <div class="tabs-nav">
+            <button class="tab-btn active" onclick="switchTab(event, 'studentsTab')">📋 إدارة الطلاب والمجموعات</button>
+            <button class="tab-btn" onclick="switchTab(event, 'billingTab')">💰 التحصيل وسندات القبض</button>
+            <button class="tab-btn" onclick="switchTab(event, 'reportsTab')">📊 التدقيق والتقارير المالية</button>
+            <button class="tab-btn" onclick="switchTab(event, 'settingsTab')">⚙️ الإعدادات وإدارة العام الدراسي</button>
+        </div>
+
+        <!-- TAB 1: Students -->
+        <div id="studentsTab" class="tab-content active">
+            <div class="main-grid">
+                <div>
+                    <div class="section-header">
+                        <h3>سجل الطلاب <span id="studentsFilteredCount" class="badge-count">0</span></h3>
+                        <button class="btn btn-print" onclick="printFilteredStudentsReport()">🖨️ طباعة الكشف المعروض</button>
+                    </div>
+                    
+                    <!-- Search & Filter Toolbar -->
+                    <div class="toolbar">
+                        <input type="text" id="stuSearchInput" placeholder="🔍 ابحث بالاسم أو الكود أو الهاتف..." oninput="renderStudents()">
+                        <select id="stuGroupFilter" onchange="renderStudents()">
+                            <option value="ALL">كل المجموعات / الصفوف</option>
+                        </select>
+                        <select id="stuStatusFilter" onchange="renderStudents()">
+                            <option value="ALL">كل حالات السداد</option>
+                            <option value="PAID">✅ المسددون بالكامل (صفر مديونية)</option>
+                            <option value="UNPAID">⚠️ عليهم مستحقات / متأخرات</option>
+                        </select>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>كود</th>
+                                    <th>اسم الطالب</th>
+                                    <th>الهاتف</th>
+                                    <th>واتساب</th>
+                                    <th>ولي الأمر</th>
+                                    <th>المجموعة</th>
+                                    <th>المديونية</th>
+                                    <th>العمليات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studentsTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div>
+                    <h3 id="studentFormTitle">إضافة طالب جديد</h3>
+                    <div style="background: var(--bg-color); padding: 15px; border-radius: 6px; border:1px solid var(--border-color); margin-top:12px;">
+                        <input type="hidden" id="studentEditId" value="">
+                        <div class="form-group">
+                            <label>الاسم الكامل:</label>
+                            <input type="text" id="stuName" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>رقم الهاتف:</label>
+                            <input type="text" id="stuPhone" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>رقم الواتساب (دولي مثلاً 20100...):</label>
+                            <input type="text" id="stuWhatsapp" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>هاتف ولي الأمر:</label>
+                            <input type="text" id="stuParentPhone" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>المجموعة / الصف الدراسي:</label>
+                            <input type="text" id="stuGroup" class="form-control" placeholder="مثال: الصف الثالث الثانوي">
+                        </div>
+                        <div class="form-group">
+                            <label>المستحقات القائمة (جنيه):</label>
+                            <input type="number" id="stuBalance" class="form-control" value="0">
+                        </div>
+                        <button class="btn btn-success" style="width:100%;" id="btnSaveStudent" onclick="saveStudent()">💾 حفظ البيانات</button>
+                        <button class="btn" id="btnCancelStudentEdit" style="background: var(--border-color); color:var(--text-color); width:100%; margin-top:6px; display:none;" onclick="cancelStudentEdit()">إلغاء التعديل</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: Billing & Payments -->
+        <div id="billingTab" class="tab-content">
+            <div class="main-grid">
+                <div>
+                    <div class="section-header">
+                        <h3>1. اختر الطالب للتحصيل <span id="billingStudentsCount" class="badge-count">0</span></h3>
+                    </div>
+
+                    <!-- Fast Search Toolbar for Billing -->
+                    <div class="toolbar">
+                        <input type="text" id="billSearchInput" placeholder="🔍 اكتب اسم الطالب أو كوده للوصول السريع..." oninput="renderBillingStudents()">
+                        <select id="billGroupFilter" onchange="renderBillingStudents()">
+                            <option value="ALL">كل المجموعات</option>
+                        </select>
+                        <select id="billDebtFilter" onchange="renderBillingStudents()">
+                            <option value="ALL">الكل</option>
+                            <option value="DEBT">عليهم مديونية فقط</option>
+                        </select>
+                    </div>
+
+                    <div class="table-container" style="max-height: 260px;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>كود</th>
+                                    <th>الاسم</th>
+                                    <th>المجموعة</th>
+                                    <th>المديونية الحالية</th>
+                                    <th>الإجراء</th>
+                                </tr>
+                            </thead>
+                            <tbody id="billingStudentsTableBody"></tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="section-header" style="margin-top: 25px;">
+                        <h3>سجل الحركات والمدفوعات <span id="paymentsFilteredCount" class="badge-count">0</span></h3>
+                        <button class="btn btn-print" onclick="printPaymentsReport()">🖨️ طباعة كشف المدفوعات</button>
+                    </div>
+
+                    <!-- Month & Year Archive Filter Toolbar -->
+                    <div class="toolbar">
+                        <input type="text" id="paySearchInput" placeholder="🔍 بحث باسم الطالب أو رقم السند..." oninput="renderPaymentsHistory()">
+                        <select id="payYearFilter" onchange="renderPaymentsHistory()">
+                            <option value="ALL">📅 كل السنوات</option>
+                        </select>
+                        <select id="payMonthFilter" onchange="renderPaymentsHistory()">
+                            <option value="ALL">🗓️ كل الشهور</option>
+                        </select>
+                    </div>
+
+                    <div class="table-container" style="max-height: 300px;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>رقم السند</th>
+                                    <th>الطالب</th>
+                                    <th>المبلغ</th>
+                                    <th>دورة الشهر / السنة</th>
+                                    <th>التاريخ والوقت</th>
+                                    <th>العمليات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="paymentsHistoryTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div>
+                    <h3>2. نافذة السداد النقدي الفوري</h3>
+                    <div style="background: var(--bg-color); padding: 15px; border-radius: 6px; border:1px solid var(--border-color); margin-top:12px;">
+                        <div class="form-group">
+                            <label>الطالب المحدد حالياً:</label>
+                            <input type="text" id="billTargetName" class="form-control" readonly style="background:var(--border-color); font-weight:bold;" placeholder="يرجى اختيار طالب من الجدول">
+                            <input type="hidden" id="billTargetId" value="">
+                        </div>
+                        <div class="form-group">
+                            <label>المبلغ المدفوع (جنيه):</label>
+                            <input type="number" id="billAmount" class="form-control" placeholder="0.00">
+                        </div>
+                        <div class="form-group">
+                            <label>عن شهر / دورة (متجدد تلقائياً مدى الحياة):</label>
+                            <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 8px;">
+                                <select id="billMonthSelect" class="form-control" style="background: var(--panel-bg);"></select>
+                                <select id="billYearSelect" class="form-control" style="background: var(--panel-bg);"></select>
+                            </div>
+                        </div>
+                        <button class="btn btn-accent" style="width:100%;" onclick="processPayment()">✅ تأكيد التحصيل وإصدار السند</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: Financial Reports -->
+        <div id="reportsTab" class="tab-content">
+            <div class="section-header">
+                <h3>بيان المراجعة الحية والتدقيق المالي الشامل</h3>
+                <button class="btn btn-print" onclick="printFullFinancialAudit()">🖨️ طباعة التقرير المالي الشامل</button>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card info">
+                    <h3>إجمالي الطلاب المسجلين</h3>
+                    <p id="statTotalStudents">0 طالب</p>
+                </div>
+                <div class="stat-card collected">
+                    <h3>إجمالي الرسوم المحصلة فعلياً</h3>
+                    <p id="statTotalCollected">0.00 ج.م</p>
+                </div>
+                <div class="stat-card arrears">
+                    <h3>إجمالي المتأخرات والديون القائمة</h3>
+                    <p id="statTotalArrears">0.00 ج.م</p>
+                </div>
+            </div>
+            <p style="color: var(--text-muted); margin-top: 5px; font-size:14px;">يعرض هذا القسم ملخصاً فورياً لكافة الحسابات، ويمكنك طباعته رسمياً بترويسة السنتر في أي وقت.</p>
+        </div>
+
+        <!-- TAB 4: Settings & Core Tools -->
+        <div id="settingsTab" class="tab-content">
+            <div style="max-width: 650px; margin: 0 auto;">
+                <h3>تغيير الهوية البصرية ومسمى المركز</h3>
+                <div style="background: var(--bg-color); padding: 15px; border-radius: 6px; border:1px solid var(--border-color); margin: 12px 0 25px 0;">
+                    <div class="form-group">
+                        <label>اسم المركز التعليمي (سيظهر بالترويسة والإيصالات والكشوف المطبوعة):</label>
+                        <input type="text" id="cfgCenterName" class="form-control">
+                    </div>
+                    <button class="btn btn-success" onclick="saveCenterNameConfig()">حفظ وتحديث الترويسة</button>
+                </div>
+
+                <div id="masterSecuritySettings">
+                    <h3>إدارة كلمات المرور والصلاحيات السيادية</h3>
+                    <div style="background: var(--bg-color); padding: 15px; border-radius: 6px; border:1px solid var(--border-color); margin: 12px 0 25px 0;">
+                        <div class="form-group">
+                            <label>تعديل كلمة مرور المدير الفائق (Master Password):</label>
+                            <input type="password" id="cfgMasterPass" class="form-control" placeholder="أدخل كلمة المرور الجديدة">
+                        </div>
+                        <div class="form-group">
+                            <label>تعديل كلمة مرور المستخدم المحدود (User Password):</label>
+                            <input type="password" id="cfgUserPass" class="form-control" placeholder="أدخل كلمة مرور الموظفين">
+                        </div>
+                        <button class="btn btn-accent" onclick="savePasswordsConfig()">تحديث كلمات المرور الآمنة</button>
+                    </div>
+
+                    <!-- Bulk Operations & New Academic Year Reset (Master Only) -->
+                    <div class="danger-zone">
+                        <h3>🎓 إدارة الاشتراكات الجماعية وبداية العام الدراسي الجديد (للمدير الفائق فقط)</h3>
+                        <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 12px;">أدوات سريعة لإضافة قسط شهري جماعي أو تصفير البيانات بضغطة زر واحدة عند بدء سنة دراسية جديدة (يُنصح بتصدير نسخة احتياطية قبل التصفير).</p>
+                        
+                        <div style="display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap;">
+                            <input type="number" id="bulkFeeAmount" class="form-control" style="max-width: 180px;" placeholder="قيمة القسط (جنيه)">
+                            <select id="bulkFeeGroup" class="form-control" style="max-width: 200px; background: var(--panel-bg);">
+                                <option value="ALL">جميع طلاب السنتر</option>
+                            </select>
+                            <button class="btn btn-warning" onclick="applyBulkMonthlyFee()">➕ إضافة قسط جماعي</button>
+                        </div>
+
+                        <div class="danger-actions">
+                            <button class="btn btn-danger" onclick="resetAllBalances()">🔄 تصفير مديونيات جميع الطلاب (جعلها 0)</button>
+                            <button class="btn btn-danger" onclick="resetPaymentsHistory()">🗑️ تصفير سجل المدفوعات فقط</button>
+                            <button class="btn btn-danger" onclick="resetStudentsOnly()">👥 حذف جميع الطلاب وتصفير المديونيات</button>
+                            <button class="btn btn-danger" style="background: #990000;" onclick="factoryResetAllData()">⚠️ تصفير شامل لبداية عام دراسي جديد</button>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 25px;">النسخ الاحتياطي ونقل البيانات (Import / Export)</h3>
+                <div style="background: var(--bg-color); padding: 15px; border-radius: 6px; border:1px solid var(--border-color); margin-top: 12px; text-align:center;">
+                    <p style="color:var(--text-muted); margin-bottom:15px; font-size:14px;">استخدم هذه الأزرار لحفظ نسخة احتياطية كاملة أو نقل النظام وبياناته إلى جهاز آخر بمرونة تامة.</p>
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn btn-success" style="width:50%;" onclick="exportSystemData()">📤 تصدير كامل البيانات (Backup)</button>
+                        <button class="btn btn-accent" style="width:50%;" onclick="document.getElementById('importFileInput').click()">📥 استيراد وتوطين البيانات</button>
+                    </div>
+                    <input type="file" id="importFileInput" style="display:none;" accept=".json" onchange="importSystemData(event)">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let appState = {
+            centerName: "مركز التميز التعليمي",
+            masterPass: "STM2026",
+            userPass: "staff123",
+            students: [],
+            payments: [],
+            theme: "dark"
+        };
+        
+        let currentUserRole = null;
+        const ARABIC_MONTHS = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
+
+        function loadFromStorage() {
+            const data = localStorage.getItem("STM_APP_DATA");
+            if (data) {
+                try { appState = JSON.parse(data); } catch(e) { console.error("Error parsing storage data"); }
+            }
+            if(!appState.masterPass) appState.masterPass = "STM2026";
+            if(!appState.userPass) appState.userPass = "staff123";
+            applyTheme();
+            document.getElementById("dynamicCenterHeader").innerText = appState.centerName;
+            document.getElementById("cfgCenterName").value = appState.centerName;
+            document.getElementById("cfgMasterPass").value = appState.masterPass;
+            document.getElementById("cfgUserPass").value = appState.userPass;
+            populateDynamicDateSelectors();
+        }
+
+        function saveToStorage() {
+            localStorage.setItem("STM_APP_DATA", JSON.stringify(appState));
+            renderAll();
+        }
+
+        function applyTheme() {
+            if (appState.theme === "light") {
+                document.body.classList.add("light-theme");
+            } else {
+                document.body.classList.remove("light-theme");
+            }
+        }
+
+        function toggleTheme() {
+            appState.theme = (appState.theme === "dark") ? "light" : "dark";
+            applyTheme();
+            localStorage.setItem("STM_APP_DATA", JSON.stringify(appState));
+        }
+
+        function attemptLogin() {
+            const role = document.getElementById("loginRole").value;
+            const pass = document.getElementById("loginPassword").value;
+            
+            if (role === "master" && pass === appState.masterPass) {
+                currentUserRole = "master";
+                initDashboard();
+            } else if (role === "user" && pass === appState.userPass) {
+                currentUserRole = "user";
+                initDashboard();
+            } else {
+                alert("خطأ! كلمة المرور غير صحيحة.");
+            }
+        }
+
+        function initDashboard() {
+            document.getElementById("gatewayLock").style.display = "none";
+            document.getElementById("appDashboard").style.display = "block";
+            
+            if(currentUserRole === "user") {
+                document.getElementById("masterSecuritySettings").style.display = "none";
+            } else {
+                document.getElementById("masterSecuritySettings").style.display = "block";
+            }
+            renderAll();
+        }
+
+        function logout() {
+            currentUserRole = null;
+            document.getElementById("loginPassword").value = "";
+            document.getElementById("gatewayLock").style.display = "flex";
+            document.getElementById("appDashboard").style.display = "none";
+        }
+
+        function switchTab(evt, tabId) {
+            const contents = document.getElementsByClassName("tab-content");
+            for (let i = 0; i < contents.length; i++) contents[i].classList.remove("active");
+            const tabs = document.getElementsByClassName("tab-btn");
+            for (let i = 0; i < tabs.length; i++) tabs[i].classList.remove("active");
+            
+            document.getElementById(tabId).classList.add("active");
+            evt.currentTarget.classList.add("active");
+            renderAll();
+        }
+
+        // Dynamic Perpetual Month & Year Selectors
+        function populateDynamicDateSelectors() {
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            const currentMonthName = ARABIC_MONTHS[now.getMonth()];
+
+            // 1. Billing Month & Year Selectors (Auto-advances forever based on system clock)
+            const monthSelect = document.getElementById("billMonthSelect");
+            const yearSelect = document.getElementById("billYearSelect");
+            monthSelect.innerHTML = "";
+            yearSelect.innerHTML = "";
+
+            ARABIC_MONTHS.forEach(m => {
+                const opt = document.createElement("option");
+                opt.value = m;
+                opt.text = m;
+                if (m === currentMonthName) opt.selected = true;
+                monthSelect.appendChild(opt);
+            });
+
+            // Generates from (Current Year - 1) up to (Current Year + 10) automatically every year
+            for (let y = currentYear - 1; y <= currentYear + 10; y++) {
+                const opt = document.createElement("option");
+                opt.value = y;
+                opt.text = y;
+                if (y === currentYear) opt.selected = true;
+                yearSelect.appendChild(opt);
+            }
+
+            // 2. Archive Filters in Payments History
+            updateHistoryDateFilters();
+        }
+
+        function updateHistoryDateFilters() {
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            
+            const yearFilter = document.getElementById("payYearFilter");
+            const monthFilter = document.getElementById("payMonthFilter");
+            const savedYear = yearFilter.value;
+            const savedMonth = monthFilter.value;
+
+            // Collect all unique years from payments + current year
+            const yearsSet = new Set([String(currentYear)]);
+            appState.payments.forEach(p => {
+                if (p.year) yearsSet.add(String(p.year));
+                else if (p.month) {
+                    const match = p.month.match(/\d{4}/);
+                    if (match) yearsSet.add(match[0]);
+                }
+            });
+
+            yearFilter.innerHTML = '<option value="ALL">📅 كل السنوات</option>';
+            Array.from(yearsSet).sort((a, b) => b - a).forEach(y => {
+                const opt = document.createElement("option");
+                opt.value = y;
+                opt.text = "سنة " + y;
+                yearFilter.appendChild(opt);
+            });
+            if (Array.from(yearsSet).includes(savedYear)) yearFilter.value = savedYear;
+
+            monthFilter.innerHTML = '<option value="ALL">🗓️ كل الشهور</option>';
+            ARABIC_MONTHS.forEach(m => {
+                const opt = document.createElement("option");
+                opt.value = m;
+                opt.text = m;
+                monthFilter.appendChild(opt);
+            });
+            if (ARABIC_MONTHS.includes(savedMonth)) monthFilter.value = savedMonth;
+        }
+
+        function updateGroupFilters() {
+            const groups = [...new Set(appState.students.map(s => s.group).filter(g => g && g.trim() !== ""))];
+            const selectors = ["stuGroupFilter", "billGroupFilter", "bulkFeeGroup"];
+            selectors.forEach(selId => {
+                const sel = document.getElementById(selId);
+                if(!sel) return;
+                const currentVal = sel.value;
+                sel.innerHTML = `<option value="ALL">${selId === 'bulkFeeGroup' ? 'جميع طلاب السنتر' : 'كل المجموعات / الصفوف'}</option>`;
+                groups.forEach(g => {
+                    const opt = document.createElement("option");
+                    opt.value = g;
+                    opt.text = g;
+                    sel.appendChild(opt);
+                });
+                if(groups.includes(currentVal)) sel.value = currentVal;
+            });
+        }
+
+        function renderAll() {
+            updateGroupFilters();
+            updateHistoryDateFilters();
+            renderStudents();
+            renderBillingStudents();
+            renderPaymentsHistory();
+            calculateMetrics();
+        }
+
+        function getFilteredStudents() {
+            const query = (document.getElementById("stuSearchInput")?.value || "").trim().toLowerCase();
+            const groupFilter = document.getElementById("stuGroupFilter")?.value || "ALL";
+            const statusFilter = document.getElementById("stuStatusFilter")?.value || "ALL";
+
+            return appState.students.filter(s => {
+                const matchQuery = !query || 
+                    s.name.toLowerCase().includes(query) || 
+                    String(s.id).includes(query) || 
+                    (s.phone && s.phone.includes(query));
+                const matchGroup = (groupFilter === "ALL") || (s.group === groupFilter);
+                const bal = parseFloat(s.balance) || 0;
+                const matchStatus = (statusFilter === "ALL") || 
+                    (statusFilter === "PAID" && bal <= 0) || 
+                    (statusFilter === "UNPAID" && bal > 0);
+                return matchQuery && matchGroup && matchStatus;
+            });
+        }
+
+        function renderStudents() {
+            const tbody = document.getElementById("studentsTableBody");
+            tbody.innerHTML = "";
+            const filtered = getFilteredStudents();
+            document.getElementById("studentsFilteredCount").innerText = filtered.length;
+
+            filtered.forEach(s => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td>${s.id}</td>
+                    <td><strong>${s.name}</strong></td>
+                    <td>${s.phone || '-'}</td>
+                    <td>${s.whatsapp || '-'}</td>
+                    <td>${s.parentPhone || '-'}</td>
+                    <td><span style="background:var(--border-color); padding:3px 7px; border-radius:4px;">${s.group || 'عام'}</span></td>
+                    <td style="color:${s.balance > 0 ? 'var(--danger-color)' : 'var(--success-color)'}; font-weight:bold;">${parseFloat(s.balance).toFixed(2)}</td>
+                    <td class="action-btns">
+                        <button class="action-btn edit-btn" onclick="startEditStudent(${s.id})">تعديل</button>
+                        ${currentUserRole === 'master' ? `<button class="action-btn delete-btn" onclick="deleteStudent(${s.id})">حذف</button>` : ''}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderBillingStudents() {
+            const tbody = document.getElementById("billingStudentsTableBody");
+            tbody.innerHTML = "";
+            const query = (document.getElementById("billSearchInput")?.value || "").trim().toLowerCase();
+            const groupFilter = document.getElementById("billGroupFilter")?.value || "ALL";
+            const debtFilter = document.getElementById("billDebtFilter")?.value || "ALL";
+
+            const filtered = appState.students.filter(s => {
+                const matchQuery = !query || s.name.toLowerCase().includes(query) || String(s.id).includes(query);
+                const matchGroup = (groupFilter === "ALL") || (s.group === groupFilter);
+                const matchDebt = (debtFilter === "ALL") || (parseFloat(s.balance) > 0);
+                return matchQuery && matchGroup && matchDebt;
+            });
+
+            document.getElementById("billingStudentsCount").innerText = filtered.length;
+
+            filtered.forEach(s => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td>${s.id}</td>
+                    <td><strong>${s.name}</strong></td>
+                    <td>${s.group || 'عام'}</td>
+                    <td style="font-weight:bold; color:${s.balance > 0 ? 'var(--danger-color)' : 'var(--success-color)'};">${parseFloat(s.balance).toFixed(2)} ج.م</td>
+                    <td><button class="btn btn-accent" style="padding:4px 10px; font-size:12px;" onclick="selectStudentForBilling(${s.id}, '${s.name.replace(/'/g, "\'")}')">اختيار 🎯</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function getFilteredPayments() {
+            const query = (document.getElementById("paySearchInput")?.value || "").trim().toLowerCase();
+            const yearFilter = document.getElementById("payYearFilter")?.value || "ALL";
+            const monthFilter = document.getElementById("payMonthFilter")?.value || "ALL";
+
+            return appState.payments.filter(p => {
+                const matchQuery = !query || p.studentName.toLowerCase().includes(query) || String(p.id).includes(query);
+                const pMonthStr = p.month || "";
+                const matchYear = (yearFilter === "ALL") || (String(p.year) === yearFilter) || pMonthStr.includes(yearFilter);
+                const matchMonth = (monthFilter === "ALL") || pMonthStr.includes(monthFilter);
+                return matchQuery && matchYear && matchMonth;
+            });
+        }
+
+        function renderPaymentsHistory() {
+            const tbody = document.getElementById("paymentsHistoryTableBody");
+            tbody.innerHTML = "";
+            const filtered = getFilteredPayments();
+            document.getElementById("paymentsFilteredCount").innerText = filtered.length;
+
+            filtered.slice().reverse().forEach(p => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td>#REC-${p.id}</td>
+                    <td><strong>${p.studentName}</strong></td>
+                    <td style="color:var(--success-color); font-weight:bold;">${parseFloat(p.amount).toFixed(2)}</td>
+                    <td>${p.month}</td>
+                    <td style="font-size:12px; color:var(--text-muted);">${p.date}</td>
+                    <td class="action-btns">
+                        <button class="action-btn edit-btn" onclick="printReceiptDirectly(${p.id})">🖨️ إيصال</button>
+                        ${currentUserRole === 'master' ? `<button class="action-btn delete-btn" onclick="deletePayment(${p.id})">حذف</button>` : ''}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function calculateMetrics() {
+            let totalCollected = 0;
+            appState.payments.forEach(p => totalCollected += parseFloat(p.amount));
+            
+            let totalArrears = 0;
+            appState.students.forEach(s => { if(parseFloat(s.balance) > 0) totalArrears += parseFloat(s.balance); });
+            
+            document.getElementById("statTotalStudents").innerText = appState.students.length + " طالب";
+            document.getElementById("statTotalCollected").innerText = totalCollected.toLocaleString('en-US', {minimumFractionDigits: 2}) + " ج.م";
+            document.getElementById("statTotalArrears").innerText = totalArrears.toLocaleString('en-US', {minimumFractionDigits: 2}) + " ج.م";
+        }
+
+        // --- Student Operations ---
+        function saveStudent() {
+            const idInput = document.getElementById("studentEditId").value;
+            const name = document.getElementById("stuName").value.trim();
+            const phone = document.getElementById("stuPhone").value.trim();
+            const whatsapp = document.getElementById("stuWhatsapp").value.trim();
+            const parentPhone = document.getElementById("stuParentPhone").value.trim();
+            const group = document.getElementById("stuGroup").value.trim();
+            const balance = parseFloat(document.getElementById("stuBalance").value) || 0;
+
+            if(!name) { alert("يجب إدخال الاسم الكامل للطالب."); return; }
+
+            if(idInput) {
+                const s = appState.students.find(x => x.id == idInput);
+                if(s) {
+                    s.name = name; s.phone = phone; s.whatsapp = whatsapp;
+                    s.parentPhone = parentPhone; s.group = group; s.balance = balance;
+                }
+                cancelStudentEdit();
+            } else {
+                const newId = appState.students.length > 0 ? Math.max(...appState.students.map(x => x.id)) + 1 : 1001;
+                appState.students.push({ id: newId, name, phone, whatsapp, parentPhone, group, balance });
+            }
+            saveToStorage();
+            clearStudentForm();
+        }
+
+        function startEditStudent(id) {
+            const s = appState.students.find(x => x.id == id);
+            if(!s) return;
+            document.getElementById("studentEditId").value = s.id;
+            document.getElementById("stuName").value = s.name;
+            document.getElementById("stuPhone").value = s.phone;
+            document.getElementById("stuWhatsapp").value = s.whatsapp;
+            document.getElementById("stuParentPhone").value = s.parentPhone;
+            document.getElementById("stuGroup").value = s.group;
+            document.getElementById("stuBalance").value = s.balance;
+            
+            document.getElementById("studentFormTitle").innerText = "تعديل بيانات الطالب رقم: " + id;
+            document.getElementById("btnCancelStudentEdit").style.display = "block";
+            document.getElementById("btnSaveStudent").className = "btn btn-accent";
+        }
+
+        function cancelStudentEdit() {
+            clearStudentForm();
+            document.getElementById("studentFormTitle").innerText = "إضافة طالب جديد";
+            document.getElementById("btnCancelStudentEdit").style.display = "none";
+            document.getElementById("btnSaveStudent").className = "btn btn-success";
+            document.getElementById("studentEditId").value = "";
+        }
+
+        function clearStudentForm() {
+            document.getElementById("stuName").value = "";
+            document.getElementById("stuPhone").value = "";
+            document.getElementById("stuWhatsapp").value = "";
+            document.getElementById("stuParentPhone").value = "";
+            document.getElementById("stuGroup").value = "";
+            document.getElementById("stuBalance").value = "0";
+        }
+
+        function deleteStudent(id) {
+            if(confirm("هل أنت متأكد تماماً من حذف هذا الطالب من المنظومة نهائياً؟")) {
+                appState.students = appState.students.filter(x => x.id != id);
+                saveToStorage();
+            }
+        }
+
+        // --- Collections Processing ---
+        function selectStudentForBilling(id, name) {
+            document.getElementById("billTargetId").value = id;
+            document.getElementById("billTargetName").value = id + " - " + name;
+            document.getElementById("billAmount").focus();
+        }
+
+        function processPayment() {
+            const studentId = document.getElementById("billTargetId").value;
+            const amount = parseFloat(document.getElementById("billAmount").value) || 0;
+            const selMonth = document.getElementById("billMonthSelect").value;
+            const selYear = document.getElementById("billYearSelect").value;
+            const fullPeriod = selMonth + " " + selYear;
+
+            if(!studentId) { alert("يرجى اختيار طالب أولاً من جدول الاختيار."); return; }
+            if(amount <= 0) { alert("يرجى إدخال قيمة مالية صحيحة أكبر من الصفر."); return; }
+
+            const s = appState.students.find(x => x.id == studentId);
+            if(!s) return;
+
+            s.balance = parseFloat(s.balance) - amount;
+            const payId = appState.payments.length > 0 ? Math.max(...appState.payments.map(x => x.id)) + 1 : 5001;
+            const timestamp = new Date().toLocaleString('ar-EG');
+            
+            const paymentObj = {
+                id: payId,
+                studentId: s.id,
+                studentName: s.name,
+                amount: amount,
+                month: fullPeriod,
+                year: selYear,
+                date: timestamp,
+                remaining: s.balance
+            };
+            appState.payments.push(paymentObj);
+            saveToStorage();
+
+            if(s.whatsapp) {
+                dispatchWhatsApp(s.whatsapp, paymentObj);
+            }
+
+            alert("✅ تم إيداع الدفعة المالية (" + fullPeriod + ") وخصمها من مديونية الطالب بنجاح.");
+            document.getElementById("billAmount").value = "";
+            document.getElementById("billTargetId").value = "";
+            document.getElementById("billTargetName").value = "";
+        }
+
+        function dispatchWhatsApp(phone, p) {
+            let cleanPhone = phone.replace(/\D/g, '');
+            if(cleanPhone.length === 11 && cleanPhone.startsWith("01")) { cleanPhone = "2" + cleanPhone; }
+            
+            const txt = `==================================\nSTM | TEL: 00201000009721\n==================================\nمركز: ${appState.centerName}\nإيصال سند قبض رقمي فوري: #REC-${p.id}\n----------------------------------\nاسم الطالب: ${p.studentName}\nالمبلغ المستلم: ${p.amount} ج.م\nعن شهر / دورة: ${p.month}\nالوقت: ${p.date}\n----------------------------------\nمستحقاتكم الحالية المتبقية: ${parseFloat(p.remaining).toFixed(2)} ج.م\nنشكركم لتعاونكم وثقتكم بنا.`;
+            const url = "https://web.whatsapp.com/send?phone=" + cleanPhone + "&text=" + encodeURIComponent(txt);
+            window.open(url, '_blank');
+        }
+
+        // --- Bulk Operations & Academic Year Reset (Master Only) ---
+        function applyBulkMonthlyFee() {
+            const fee = parseFloat(document.getElementById("bulkFeeAmount").value) || 0;
+            const targetGroup = document.getElementById("bulkFeeGroup").value;
+            if (fee <= 0) { alert("يرجى إدخال قيمة قسط صحيحة أكبر من الصفر."); return; }
+
+            const label = targetGroup === "ALL" ? "جميع طلاب السنتر" : "طلاب مجموعة (" + targetGroup + ")";
+            if (confirm(`هل تود إضافة مبلغ (${fee} ج.م) كقسط شهري جديد على ذمة ${label}؟`)) {
+                let count = 0;
+                appState.students.forEach(s => {
+                    if (targetGroup === "ALL" || s.group === targetGroup) {
+                        s.balance = (parseFloat(s.balance) || 0) + fee;
+                        count++;
+                    }
+                });
+                saveToStorage();
+                document.getElementById("bulkFeeAmount").value = "";
+                alert(`✅ تم إضافة القسط الشهري بنجاح لعدد (${count}) طالب.`);
+            }
+        }
+
+        function resetAllBalances() {
+            if (confirm("تحذير! سيتم تصفير المديونيات والمستحقات المالية لجميع الطلاب لتصبح (0.00 ج.م). هل تريد المتابعة؟")) {
+                appState.students.forEach(s => s.balance = 0);
+                saveToStorage();
+                alert("✅ تم تصفير مديونيات جميع الطلاب بنجاح.");
+            }
+        }
+
+        function resetPaymentsHistory() {
+            if (confirm("تحذير نهائي! سيتم مسح سجل المدفوعات وسندات القبض بالكامل. هل قمت بتصدير نسخة احتياطية وتريد المتابعة؟")) {
+                appState.payments = [];
+                saveToStorage();
+                alert("✅ تم تصفير سجل المدفوعات بنجاح.");
+            }
+        }
+
+        function resetStudentsOnly() {
+            if (confirm("تحذير نهائي! سيتم حذف قائمة الطلاب بالكامل من النظام. هل تريد المتابعة؟")) {
+                appState.students = [];
+                saveToStorage();
+                alert("✅ تم حذف جميع الطلاب بنجاح.");
+            }
+        }
+
+        function factoryResetAllData() {
+            if (confirm("⚠️ تحذير سيادي لبداية عام دراسي جديد! سيتم مسح كافة الطلاب وسجل المدفوعات بالكامل وتهيئة النظام من الصفر. هل أنت متأكد؟")) {
+                appState.students = [];
+                appState.payments = [];
+                saveToStorage();
+                alert("🎓 تمت تهيئة النظام بالكامل بنجاح لبداية عام دراسي جديد!");
+            }
+        }
+
+        // --- Professional Print Reports Engine ---
+        function openPrintWindow(title, subtitle, tableHeaders, rowsHtml, summaryHtml) {
+            const nowStr = new Date().toLocaleString('ar-EG');
+            const printWin = window.open('', '', 'width=900,height=700');
+            printWin.document.write(`
+                <html dir="rtl" lang="ar">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>${title} - ${appState.centerName}</title>
+                    <style>
+                        body { font-family: 'Segoe UI', Tahoma, sans-serif; padding: 25px; color: #111; background: #fff; }
+                        .header { text-align: center; border-bottom: 2px solid #0056b3; padding-bottom: 12px; margin-bottom: 20px; }
+                        .header h1 { font-size: 22px; color: #0056b3; margin-bottom: 5px; }
+                        .header h2 { font-size: 17px; color: #333; margin-bottom: 5px; }
+                        .meta { display: flex; justify-content: space-between; font-size: 12px; color: #555; margin-bottom: 15px; }
+                        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 13px; }
+                        th, td { border: 1px solid #bbb; padding: 8px 10px; text-align: right; }
+                        th { background-color: #f0f4f8; font-weight: bold; }
+                        tr:nth-child(even) { background-color: #fafafa; }
+                        .summary { background: #f8f9fa; border: 1px solid #ccc; padding: 12px 15px; border-radius: 6px; font-size: 14px; font-weight: bold; }
+                        .footer { text-align: center; margin-top: 25px; font-size: 11px; color: #777; border-top: 1px dashed #ccc; padding-top: 10px; }
+                    </style>
+                </head>
+                <body onload="window.print();">
+                    <div class="header">
+                        <h1>${appState.centerName}</h1>
+                        <h2>${title}</h2>
+                        <div style="font-size:13px; color:#666;">${subtitle}</div>
+                    </div>
+                    <div class="meta">
+                        <span>تاريخ الطباعة: ${nowStr}</span>
+                        <span>نظام STM لإدارة السناتر التعليمية | 00201000009721</span>
+                    </div>
+                    <table>
+                        <thead><tr>${tableHeaders}</tr></thead>
+                        <tbody>${rowsHtml}</tbody>
+                    </table>
+                    <div class="summary">${summaryHtml}</div>
+                    <div class="footer">تم إصدار هذا الكشف آلياً بواسطة منظومة STM للبرمجيات ونظم إدارة المنشآت الذكية</div>
+                </body>
+                </html>
+            `);
+            printWin.document.close();
+        }
+
+        function printFilteredStudentsReport() {
+            const list = getFilteredStudents();
+            if (list.length === 0) { alert("لا توجد بيانات مطابقة للطباعة حالياً."); return; }
+            const statusText = document.getElementById("stuStatusFilter").options[document.getElementById("stuStatusFilter").selectedIndex].text;
+            const groupText = document.getElementById("stuGroupFilter").options[document.getElementById("stuGroupFilter").selectedIndex].text;
+            
+            let totalDebt = 0;
+            const rows = list.map((s, idx) => {
+                const bal = parseFloat(s.balance) || 0;
+                if (bal > 0) totalDebt += bal;
+                return `<tr>
+                    <td>${idx + 1}</td>
+                    <td>${s.id}</td>
+                    <td><strong>${s.name}</strong></td>
+                    <td>${s.group || 'عام'}</td>
+                    <td>${s.phone || '-'}</td>
+                    <td>${s.parentPhone || '-'}</td>
+                    <td style="color:${bal > 0 ? '#c00' : '#080'}; font-weight:bold;">${bal.toFixed(2)} ج.م</td>
+                </tr>`;
+            }).join("");
+
+            openPrintWindow(
+                "كشف بيانات ومستحقات الطلاب",
+                `التصفية: ${groupText} | الحالة: ${statusText}`,
+                "<th>م</th><th>كود الطالب</th><th>اسم الطالب</th><th>المجموعة</th><th>هاتف الطالب</th><th>هاتف ولي الأمر</th><th>المديونية القائمة</th>",
+                rows,
+                `إجمالي عدد الطلاب بالكشف: (${list.length}) طالب &nbsp;|&nbsp; إجمالي المستحقات القائمة بالكشف: (${totalDebt.toLocaleString('en-US', {minimumFractionDigits: 2})}) جنيه مصري`
+            );
+        }
+
+        function printPaymentsReport() {
+            const list = getFilteredPayments();
+            if (list.length === 0) { alert("لا توجد مدفوعات مطابقة للطباعة حالياً."); return; }
+            const yearText = document.getElementById("payYearFilter").options[document.getElementById("payYearFilter").selectedIndex].text;
+            const monthText = document.getElementById("payMonthFilter").options[document.getElementById("payMonthFilter").selectedIndex].text;
+            
+            let totalPaid = 0;
+            const rows = list.map((p, idx) => {
+                const amt = parseFloat(p.amount) || 0;
+                totalPaid += amt;
+                return `<tr>
+                    <td>${idx + 1}</td>
+                    <td>#REC-${p.id}</td>
+                    <td><strong>${p.studentName}</strong></td>
+                    <td>${p.month}</td>
+                    <td style="font-weight:bold; color:#080;">${amt.toFixed(2)} ج.م</td>
+                    <td>${p.date}</td>
+                </tr>`;
+            }).join("");
+
+            openPrintWindow(
+                "كشف المتحصلات وسندات القبض",
+                `الفترة: ${monthText} - ${yearText}`,
+                "<th>م</th><th>رقم السند</th><th>اسم الطالب</th><th>عن دورة / شهر</th><th>المبلغ المحصل</th><th>تاريخ ووقت التحصيل</th>",
+                rows,
+                `إجمالي عدد السندات: (${list.length}) سند &nbsp;|&nbsp; إجمالي المبالغ المحصلة بالكشف: (${totalPaid.toLocaleString('en-US', {minimumFractionDigits: 2})}) جنيه مصري`
+            );
+        }
+
+        function printFullFinancialAudit() {
+            let totalCollected = 0;
+            appState.payments.forEach(p => totalCollected += parseFloat(p.amount) || 0);
+            let totalArrears = 0;
+            let debtorsCount = 0;
+            appState.students.forEach(s => {
+                const bal = parseFloat(s.balance) || 0;
+                if (bal > 0) { totalArrears += bal; debtorsCount++; }
+            });
+
+            const rows = `
+                <tr><td>إجمالي عدد الطلاب المسجلين بالمنظومة</td><td><strong>${appState.students.length} طالب</strong></td></tr>
+                <tr><td>عدد الطلاب المسددين بالكامل (صفر مديونية)</td><td><strong>${appState.students.length - debtorsCount} طالب</strong></td></tr>
+                <tr><td>عدد الطلاب المتأخرين في السداد</td><td><strong style="color:#c00;">${debtorsCount} طالب</strong></td></tr>
+                <tr><td>إجمالي عدد سندات القبض الصادرة</td><td><strong>${appState.payments.length} سند</strong></td></tr>
+                <tr><td>إجمالي الإيرادات والرسوم المحصلة فعلياً</td><td><strong style="color:#080; font-size:15px;">${totalCollected.toLocaleString('en-US', {minimumFractionDigits: 2})} جنيه مصري</strong></td></tr>
+                <tr><td>إجمالي المديونيات والمتأخرات القائمة بذمة الطلاب</td><td><strong style="color:#c00; font-size:15px;">${totalArrears.toLocaleString('en-US', {minimumFractionDigits: 2})} جنيه مصري</strong></td></tr>
+            `;
+
+            openPrintWindow(
+                "التقرير المالي الختامي والتدقيق الشامل",
+                "ملخص الموقف المالي العام للمركز التعليمي",
+                "<th>البيان المالي والإداري</th><th>القيمة الإجمالية</th>",
+                rows,
+                `صافي الموقف المالي المعتمد بتاريخ الطباعة`
+            );
+        }
+
+        function printReceiptDirectly(payId) {
+            const p = appState.payments.find(x => x.id == payId);
+            if(!p) return;
+            const printWin = window.open('', '', 'width=600,height=600');
+            printWin.document.write(`
+                <html dir="rtl" lang="ar">
+                <head><title>طباعة إيصال رقم #REC-${p.id}</title></head>
+                <body style="font-family:monospace; padding:3px; text-align:center; color:#000; background:#fff;" onload="window.print();window.close();">
+                    <div>========================================</div>
+                    <div style="font-size:12px;font-weight:bold;">STM | TEL: 00201000009721</div>
+                    <div style="font-size:11px;">Email: khaledshouab2@gmail.com</div>
+                    <div>========================================</div>
+                    <div style="font-size:15px; font-weight:bold; margin:10px 0;">مركز: ${appState.centerName}</div>
+                    <div style="text-align:right; font-size:13px; line-height:1.6;">
+                        <strong>رقم السند الفوري:</strong> #REC-${p.id}<br>
+                        <strong>تاريخ الحركة:</strong> ${p.date}<br>
+                        <strong>اسم الطالب الثلاثي:</strong> ${p.studentName}<br>
+                        <strong>المبلغ المستلم الفعلي:</strong> ${p.amount} جنيه مصري<br>
+                        <strong>عن شهر / دورة:</strong> ${p.month}<br>
+                        ----------------------------------------<br>
+                        <strong>المستحقات المتبقية بذمة الطالب:</strong> ${parseFloat(p.remaining).toFixed(2)} جنيه مصري.
+                    </div>
+                    <div style="margin-top:20px;">شكرًا لتعاونكم معنا دائماً.</div>
+                    <div>========================================</div>
+                </body>
+                </html>
+            `);
+            printWin.document.close();
+        }
+
+        function deletePayment(id) {
+            if(confirm("تحذير سيادي! حذف هذا السند سيلغي العملية المالية، هل تود إعادة المبلغ المحذوف لحساب مديونية الطالب أولاً؟")) {
+                const p = appState.payments.find(x => x.id == id);
+                if(p) {
+                    const s = appState.students.find(x => x.id == p.studentId);
+                    if(s) { s.balance = parseFloat(s.balance) + parseFloat(p.amount); }
+                }
+                appState.payments = appState.payments.filter(x => x.id != id);
+                saveToStorage();
+            }
+        }
+
+        function saveCenterNameConfig() {
+            const name = document.getElementById("cfgCenterName").value.trim();
+            if(name) {
+                appState.centerName = name;
+                document.getElementById("dynamicCenterHeader").innerText = name;
+                saveToStorage();
+                alert("تم تحديث وحفظ مسمى الترويسة بنجاح.");
+            }
+        }
+
+        function savePasswordsConfig() {
+            const m = document.getElementById("cfgMasterPass").value.trim();
+            const u = document.getElementById("cfgUserPass").value.trim();
+            if(m && u) {
+                appState.masterPass = m;
+                appState.userPass = u;
+                saveToStorage();
+                alert("تم تحديث كلمات المرور الجديدة بنجاح.");
+            }
+        }
+
+        function exportSystemData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState, null, 4));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            const date = new Date().toISOString().slice(0,10);
+            downloadAnchor.setAttribute("download", `STM_DATABASE_BACKUP_${date}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function importSystemData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    if(importedData.masterPass && Array.isArray(importedData.students)) {
+                        appState = importedData;
+                        saveToStorage();
+                        alert("تم استيراد قاعدة البيانات بنجاح وتوطين معلومات الطلاب والعمليات كاملة.");
+                        location.reload();
+                    } else { alert("الملف المختار غير صالح ولا يطابق هيكلية نظام STM المعتمدة."); }
+                } catch(err) { alert("فشل في قراءة وتفسير بيانات ملف الـ JSON المختار."); }
+            };
+            reader.readAsText(file);
+        }
+
+        window.onload = loadFromStorage;
+    </script>
+    <!-- محقن المعاينة التفاعلية المحمية لقسم الشؤون المالية -->
+    <div id="demoAlertModal" style="position:fixed; inset:0; background:rgba(15,23,42,0.82); z-index:999999; display:none; align-items:center; justify-content:center; padding:16px;">
+        <div style="background:#ffffff; color:#0f172a; border-radius:16px; width:100%; max-width:420px; padding:26px; text-align:center; box-shadow:0 20px 40px rgba(0,0,0,0.45); border-top:5px solid #d97706;">
+            <div style="font-size:42px; margin-bottom:8px;">🔒</div>
+            <h3 style="font-size:18px; font-weight:800; color:#1e3a8a; margin-bottom:8px;">هذه نسخة معاينة للمشاهدة فقط</h3>
+            <p style="font-size:13px; color:#475569; line-height:1.6; margin-bottom:18px;">
+                لا يمكن إضافة أو تعديل أو حذف أو طباعة السندات والكشوف في نسخة العرض الأونلاين.<br>
+                للحصول على <strong>النسخة الكاملة العاملة بدون إنترنت 100%</strong> والمحمية بفلاشة الأمان، تواصل معنا الآن:
+            </p>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+                <a href="https://wa.me،%20أرغب%20في%20الحصول%20على%20النسخة%20الكاملة%20من%20منظومة%20STM" target="_blank" style="background:#16a34a; color:#ffffff; text-decoration:none; padding:11px; border-radius:10px; font-size:14px; font-weight:800;">
+                    💬 اطلب النسخة الكاملة عبر واتساب الآن
+                </a>
+                <button onclick="document.getElementById('demoAlertModal').style.display='none'" style="background:#f1f5f9; color:#334155; border:1px solid #cbd5e1; padding:9px; border-radius:10px; font-size:13px; font-weight:700; cursor:pointer; font-family:inherit;">
+                    متابعة تصفح المعاينة
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function initFinanceDemoMode() {
+            function showDemoBlocked() {
+                document.getElementById('demoAlertModal').style.display = 'flex';
+            }
+
+            window.addEventListener('load', function() {
+                appState = {
+                    centerName: "سنتر النخبة التعليمي (معاينة حية)",
+                    masterPass: "DEMO",
+                    userPass: "DEMO",
+                    theme: "light",
+                    students: [
+                        { id: 1001, name: "أحمد محمود عبد الرحمن", phone: "01012345678", whatsapp: "201012345678", parentPhone: "01112345678", group: "الصف الثالث الثانوي - علمي", balance: 0 },
+                        { id: 1002, name: "سارة إبراهيم محمد علي", phone: "01023456789", whatsapp: "201023456789", parentPhone: "01223456789", group: "الصف الثالث الثانوي - علمي", balance: 150 },
+                        { id: 1003, name: "يوسف خالد حسن مصطفى", phone: "01034567890", whatsapp: "201034567890", parentPhone: "01534567890", group: "الصف الثاني الثانوي", balance: 0 },
+                        { id: 1004, name: "مريم طارق سعيد السيد", phone: "01045678901", whatsapp: "201045678901", parentPhone: "01145678901", group: "الصف الأول الثانوي", balance: 250 },
+                        { id: 1005, name: "عمر وليد فؤاد محمود", phone: "01056789012", whatsapp: "201056789012", parentPhone: "01256789012", group: "الصف الثالث الثانوي - علمي", balance: 300 }
+                    ],
+                    payments: [
+                        { id: 5001, studentId: 1001, studentName: "أحمد محمود عبد الرحمن", amount: 300, month: "نوفمبر 2026", year: "2026", date: "2026/11/05 - 04:15 م", remaining: 0 },
+                        { id: 5002, studentId: 1002, studentName: "سارة إبراهيم محمد علي", amount: 150, month: "نوفمبر 2026", year: "2026", date: "2026/11/08 - 05:20 م", remaining: 150 },
+                        { id: 5003, studentId: 1003, studentName: "يوسف خالد حسن مصطفى", amount: 250, month: "نوفمبر 2026", year: "2026", date: "2026/11/10 - 06:00 م", remaining: 0 },
+                        { id: 5004, studentId: 1001, studentName: "أحمد محمود عبد الرحمن", amount: 300, month: "أكتوبر 2026", year: "2026", date: "2026/10/04 - 04:10 م", remaining: 0 }
+                    ]
+                };
+                currentUserRole = "master";
+                applyTheme();
+                document.getElementById("dynamicCenterHeader").innerText = appState.centerName;
+                document.getElementById("gatewayLock").style.display = "none";
+                document.getElementById("appDashboard").style.display = "block";
+                renderAll();
+            });
+
+            window.saveToStorage = function() {};
+            window.logout = showDemoBlocked;
+            window.saveStudent = showDemoBlocked;
+            window.startEditStudent = showDemoBlocked;
+            window.deleteStudent = showDemoBlocked;
+            window.processPayment = showDemoBlocked;
+            window.deletePayment = showDemoBlocked;
+            window.applyBulkMonthlyFee = showDemoBlocked;
+            window.resetAllBalances = showDemoBlocked;
+            window.resetPaymentsHistory = showDemoBlocked;
+            window.resetStudentsOnly = showDemoBlocked;
+            window.factoryResetAllData = showDemoBlocked;
+            window.saveCenterNameConfig = showDemoBlocked;
+            window.savePasswordsConfig = showDemoBlocked;
+            window.exportSystemData = showDemoBlocked;
+            window.importSystemData = showDemoBlocked;
+            window.printFilteredStudentsReport = showDemoBlocked;
+            window.printPaymentsReport = showDemoBlocked;
+            window.printFullFinancialAudit = showDemoBlocked;
+            window.printReceiptDirectly = showDemoBlocked;
+
+            document.addEventListener('contextmenu', e => e.preventDefault());
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'F12' || (e.ctrlKey && ['u','U','s','S','p','P'].includes(e.key))) {
+                    e.preventDefault();
+                    if (e.key === 'p' || e.key === 'P') showDemoBlocked();
+                }
+            });
+        })();
+    </script>
+
+</body>
+</html>

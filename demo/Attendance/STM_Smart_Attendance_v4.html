@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STM Smart Attendance System - Pro Edition</title>
+    <style>
+        :root {
+            --bg-body: #f1f5f9; --bg-card: #ffffff; --bg-sub: #f8fafc;
+            --text-main: #0f172a; --text-muted: #64748b; --border-color: #cbd5e1;
+            --primary: #1d4ed8; --primary-hover: #1e40af;
+            --success: #059669; --success-bg: #d1fae5; --success-text: #065f46;
+            --danger: #dc2626; --danger-bg: #fee2e2; --danger-text: #991b1b;
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+        body.dark-mode {
+            --bg-body: #0b1120; --bg-card: #1e293b; --bg-sub: #0f172a;
+            --text-main: #f8fafc; --text-muted: #94a3b8; --border-color: #334155;
+            --primary: #3b82f6; --primary-hover: #2563eb;
+            --success-bg: rgba(16,185,129,0.2); --success-text: #34d399;
+            --danger-bg: rgba(239,68,68,0.2); --danger-text: #f87171;
+            --shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg-body); color: var(--text-main); padding: 16px; line-height: 1.5; }
+        .header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #312e81 100%);
+            color: #fff; border-radius: 14px; padding: 18px 24px; margin-bottom: 18px;
+            display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 15px;
+        }
+        .header h1 { font-size: 21px; font-weight: 800; }
+        .header p { font-size: 13px; color: #bfdbfe; margin-top: 3px; }
+        .header-badges { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 12px; }
+        .badge-info { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25); padding: 5px 11px; border-radius: 8px; font-weight: 700; }
+        .btn {
+            border: none; border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 700;
+            cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-family: inherit;
+        }
+        .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+        .btn-primary { background: var(--primary); color: #fff; }
+        .btn-success { background: var(--success); color: #fff; }
+        .btn-danger { background: var(--danger); color: #fff; }
+        .btn-warning { background: #f59e0b; color: #0f172a; }
+        .btn-outline { background: transparent; border: 1px solid var(--border-color); color: var(--text-main); }
+        .btn-sm { padding: 5px 10px; font-size: 12px; }
+        .w-full { width: 100%; }
+        .card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 18px; box-shadow: var(--shadow); margin-bottom: 18px; }
+        .card-title { font-size: 15px; font-weight: 700; color: var(--primary); border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; }
+        .main-grid { display: grid; grid-template-columns: 350px 1fr; gap: 20px; align-items: start; }
+        @media (max-width: 960px) { .main-grid { grid-template-columns: 1fr; } }
+        .form-group { margin-bottom: 12px; }
+        .form-label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 5px; color: var(--text-muted); }
+        .form-control { width: 100%; padding: 9px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-sub); color: var(--text-main); font-size: 13px; font-family: inherit; }
+        .input-row { display: flex; gap: 8px; }
+        .camera-box { background: #020617; border: 2px dashed #334155; border-radius: 10px; min-height: 165px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; margin-bottom: 12px; color: #94a3b8; text-align: center; padding: 10px; }
+        .camera-box video { width: 100%; height: 175px; object-fit: cover; border-radius: 8px; display: none; }
+        .scan-line { position: absolute; top: 0; left: 0; right: 0; height: 2px; background: #10b981; box-shadow: 0 0 8px #10b981; animation: scanAnim 2.2s infinite linear; display: none; }
+        @keyframes scanAnim { 0% { top: 15%; } 50% { top: 85%; } 100% { top: 15%; } }
+        .tabs-bar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; }
+        .tabs-group { display: flex; flex-wrap: wrap; background: var(--bg-sub); padding: 4px; border-radius: 10px; border: 1px solid var(--border-color); gap: 4px; }
+        .tab-btn { background: transparent; border: none; padding: 7px 13px; border-radius: 7px; font-size: 12px; font-weight: 700; color: var(--text-muted); cursor: pointer; font-family: inherit; }
+        .tab-btn.active { background: var(--primary); color: #fff; }
+        .filter-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-bottom: 14px; background: var(--bg-sub); padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); }
+        .table-responsive { overflow-x: auto; width: 100%; }
+        table { width: 100%; border-collapse: collapse; text-align: right; font-size: 13px; }
+        th { background: var(--bg-sub); color: var(--text-muted); font-weight: 700; padding: 10px 12px; border-bottom: 2px solid var(--border-color); white-space: nowrap; }
+        td { padding: 10px 12px; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
+        .status-pill { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; cursor: pointer; }
+        .status-present { background: var(--success-bg); color: var(--success-text); }
+        .status-absent { background: var(--danger-bg); color: var(--danger-text); }
+        .qr-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(185px, 1fr)); gap: 14px; }
+        .qr-card { background: var(--bg-sub); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px; text-align: center; display: flex; flex-direction: column; align-items: center; }
+        .qr-canvas-box { background: #fff; padding: 6px; border-radius: 6px; border: 1px solid #cbd5e1; margin: 8px 0; max-width: 100%; }
+        .modal-backdrop { position: fixed; inset: 0; background: rgba(15,23,42,0.75); display: none; align-items: center; justify-content: center; z-index: 9999; padding: 16px; }
+        .modal-backdrop.show { display: flex; }
+        .modal-box { background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 14px; width: 100%; max-width: 450px; padding: 22px; }
+        .modal-box.modal-lg { max-width: 820px; max-height: 90vh; overflow-y: auto; }
+        .toast-msg { position: fixed; bottom: 20px; left: 20px; background: #0f172a; color: #fff; padding: 12px 20px; border-radius: 10px; font-size: 13px; font-weight: 700; z-index: 10000; border-right: 4px solid #10b981; display: none; }
+        .hidden { display: none !important; }
+        .print-only { display: none; }
+        @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            body { background: #fff !important; color: #000 !important; padding: 0 !important; }
+            .main-grid { display: block !important; }
+            .card { box-shadow: none !important; border: none !important; padding: 0 !important; }
+            table { border: 1px solid #000 !important; }
+            th, td { border: 1px solid #64748b !important; color: #000 !important; padding: 7px !important; }
+            .qr-grid { display: grid !important; grid-template-columns: repeat(3, 1fr) !important; gap: 12px !important; }
+            .qr-card { border: 1px dashed #64748b !important; break-inside: avoid !important; background: #fff !important; }
+            .print-header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 14px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loginOverlay" style="position:fixed; inset:0; background:linear-gradient(135deg,#0f172a 0%,#1e3a8a 100%); z-index:99999; display:flex; align-items:center; justify-content:center; padding:16px;">
+        <div style="background:#ffffff; color:#0f172a; border-radius:16px; width:100%; max-width:400px; padding:28px; text-align:center; box-shadow:0 25px 50px rgba(0,0,0,0.5);">
+            <div style="font-size:40px; margin-bottom:8px;">🔐</div>
+            <h2 style="font-size:20px; font-weight:800; color:#1e3a8a;">نظام الحضور الذكي - STM</h2>
+            <p style="font-size:12px; color:#64748b; margin:6px 0 18px;">أدخل كلمة مرور المدير العام (Master) أو الموظف للدخول</p>
+            <input type="password" id="loginPassInput" placeholder="أدخل كلمة المرور..." onkeydown="if(event.key==='Enter') unlockSystem()" style="width:100%; padding:11px 14px; border:2px solid #cbd5e1; border-radius:10px; font-size:14px; text-align:center; margin-bottom:12px;">
+            <button onclick="unlockSystem()" style="width:100%; background:#1d4ed8; color:#ffffff; border:none; border-radius:10px; padding:11px; font-size:14px; font-weight:700; cursor:pointer;">🔓 دخول للنظام</button>
+            <div id="loginErrorMsg" style="color:#dc2626; font-size:12px; font-weight:700; margin-top:10px; display:none;">❌ كلمة المرور غير صحيحة!</div>
+        </div>
+    </div>
+    <!-- END_CHUNK_1 -->
+    <header class="header no-print">
+        <div>
+            <h1>STM Smart Attendance System</h1>
+            <p>نظام إدارة الحضور والغياب الذكي للمجموعات والسناتر التعليمية</p>
+        </div>
+        <div class="header-badges">
+            <div class="badge-info" id="userRoleBadge">👤 الحساب: غير مسجل</div>
+            <button onclick="openSettingsModal()" id="settingsBtn" class="btn btn-warning btn-sm hidden">⚙️ الإعدادات وكلمات المرور</button>
+            <button onclick="lockSystem()" class="btn btn-danger btn-sm">🔒 قفل الشاشة</button>
+            <button onclick="testBeepSound()" class="btn btn-success btn-sm">🔊 اختبار الصوت</button>
+            <button onclick="toggleTheme()" class="btn btn-outline btn-sm" id="themeBtn" style="color:#fff; border-color:rgba(255,255,255,0.4);">🌙 النمط المظلم</button>
+        </div>
+    </header>
+
+    <section class="card no-print" style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:12px;">
+        <div>
+            <strong style="font-size:14px;">💾 منظومة النسخ الاحتياطي ونقل البيانات بالفلاشة:</strong>
+            <div style="font-size:11px; color:var(--text-muted);">تشمل المجموعات، الطلاب، كروت الباركود، وأرشيف الحصص السابقة بالكامل</div>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button onclick="exportData()" class="btn btn-success">📤 تصدير نسخة احتياطية (JSON)</button>
+            <label class="btn btn-primary" style="cursor:pointer;">
+                📥 استيراد بيانات من ملف
+                <input type="file" id="importFile" class="hidden" accept=".json" onchange="importData(event)">
+            </label>
+        </div>
+    </section>
+
+    <main class="main-grid">
+        <aside class="no-print">
+            <div class="card">
+                <div class="card-title">
+                    <span>📂 إدارة المجموعات الدراسية</span>
+                    <span id="groupsCountBadge" style="font-size:11px; color:var(--text-muted);"></span>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">إضافة مجموعة دراسية جديدة:</label>
+                    <div class="input-row">
+                        <input type="text" id="groupInput" class="form-control" placeholder="مثال: فيزياء - السبت 4 عصراً" onkeydown="if(event.key==='Enter') addGroup()">
+                        <button onclick="addGroup()" class="btn btn-primary">إضافة</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">المجموعة النشطة حالياً:</label>
+                    <select id="groupSelect" onchange="switchGroup()" class="form-control" style="font-weight:700;"></select>
+                </div>
+                <button onclick="deleteActiveGroup()" id="delGroupBtn" class="btn btn-danger w-full btn-sm">🗑️ حذف هذه المجموعة النشطة بالكامل</button>
+            </div>
+
+            <div class="card">
+                <div class="card-title"><span>👤 تسجيل طالب وتوليد كارت باركود</span></div>
+                <div class="form-group">
+                    <label class="form-label">اسم الطالب رباعي:</label>
+                    <input type="text" id="studentNameInput" class="form-control" placeholder="أدخل اسم الطالب بالكامل">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">كود الطالب الفريد (إنجليزي أو أرقام):</label>
+                    <div class="input-row">
+                        <input type="text" id="studentCodeInput" class="form-control" placeholder="مثال: STM-101 أو رقم الهاتف" onkeydown="if(event.key==='Enter') addStudent()">
+                        <button onclick="generateAutoCode()" class="btn btn-outline btn-sm">🎲 تلقائي</button>
+                    </div>
+                </div>
+                <button onclick="addStudent()" class="btn btn-primary w-full">✨ إدراج الطالب وتوليد كارت الباركود</button>
+            </div>
+
+            <div class="card">
+                <div class="card-title"><span>📷 ماسح الحضور الذكي (كاميرا / قارئ / يدوي)</span></div>
+                <div class="camera-box">
+                    <video id="qrVideo" playsinline></video>
+                    <div class="scan-line" id="scanLine"></div>
+                    <div id="cameraPlaceholder">
+                        <div style="font-size:28px; margin-bottom:4px;">📸</div>
+                        <div style="font-size:12px; font-weight:700; color:#e2e8f0;">عدسة الكاميرا / قارئ الباركود جاهز</div>
+                        <div style="font-size:11px; margin-top:3px;">شغّل الكاميرا أو مرر كارت الطالب أمام القارئ</div>
+                    </div>
+                </div>
+                <div style="display:flex; gap:6px; margin-bottom:12px;">
+                    <button onclick="startCameraScanner()" id="startCamBtn" class="btn btn-primary btn-sm w-full">🎥 تشغيل كاميرا اللابتوب</button>
+                    <button onclick="stopCameraScanner()" id="stopCamBtn" class="btn btn-danger btn-sm hidden">⏹ إيقاف</button>
+                </div>
+                <div>
+                    <label class="form-label">مسح القارئ (USB Scanner) أو الإدخال اليدوي:</label>
+                    <div class="input-row">
+                        <input type="text" id="scanInput" class="form-control" placeholder="مرر الكارت أو اكتب الكود واضغط Enter" onkeydown="if(event.key==='Enter') triggerManualScan()">
+                        <button onclick="triggerManualScan()" class="btn btn-success">حضور</button>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <section>
+            <div class="card no-print tabs-bar">
+                <div class="tabs-group">
+                    <button onclick="switchTab('all')" id="tab-all" class="tab-btn active">📋 الكشف الرئيسي</button>
+                    <button onclick="switchTab('cards')" id="tab-cards" class="tab-btn">🎴 كروت الباركود</button>
+                    <button onclick="switchTab('archive')" id="tab-archive" class="tab-btn">🗄️ أرشيف الحصص السابقة</button>
+                </div>
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                    <button onclick="openSaveSessionModal()" class="btn btn-success">💾 حفظ الحصة الحالية وبدء حصة جديدة</button>
+                    <button onclick="window.print()" class="btn btn-primary">🖨️ طباعة الكشف / الكروت</button>
+                </div>
+            </div>
+
+            <div class="card" id="tableSection">
+                <div class="print-only print-header">
+                    <h2 style="font-size:18px; font-weight:800;">تقرير حضور وغياب الطلاب الرسمي - منظومة STM</h2>
+                    <div style="margin-top:6px; font-size:12px;">
+                        <span>نطاق العرض: <strong id="printGroupName">-</strong></span> | 
+                        <span>التصفية: <strong id="printFilterName">-</strong></span> | 
+                        <span>التاريخ: <strong id="printDate">-</strong></span>
+                    </div>
+                </div>
+                <div class="card-title">
+                    <span>📋 كشف الطلاب: <strong id="activeGroupHeading" style="color:var(--success);"></strong></span>
+                    <span id="statsSummary" style="font-size:12px; color:var(--text-muted); font-weight:700;"></span>
+                </div>
+
+                <!-- شريط التصفية والفرز الحقيقي قبل الطباعة -->
+                <div class="filter-bar no-print">
+                    <input type="text" id="searchInput" onkeyup="renderStudents()" class="form-control" placeholder="🔍 بحث بالاسم أو الكود...">
+                    <select id="filterGroupMode" onchange="renderStudents()" class="form-control">
+                        <option value="ACTIVE">تصفية المجموعة: النشطة فقط</option>
+                        <option value="ALL">تصفية المجموعة: جميع المجموعات</option>
+                    </select>
+                    <select id="filterStatusMode" onchange="renderStudents()" class="form-control">
+                        <option value="ALL">تصفية الحالة: الكل (حاضر + غائب)</option>
+                        <option value="PRESENT">تصفية الحالة: الحاضرون فقط</option>
+                        <option value="ABSENT">تصفية الحالة: الغائبون فقط</option>
+                    </select>
+                    <select id="sortSelect" onchange="renderStudents()" class="form-control">
+                        <option value="default">ترتيب: الافتراضي</option>
+                        <option value="name_asc">ترتيب: الاسم (أ - ي)</option>
+                        <option value="name_desc">ترتيب: الاسم (ي - أ)</option>
+                        <option value="group_asc">ترتيب: المجموعة الدراسية</option>
+                        <option value="code_asc">ترتيب: كود الطالب</option>
+                        <option value="status_present">ترتيب: الحاضرون أولاً</option>
+                        <option value="status_absent">ترتيب: الغائبون أولاً</option>
+                    </select>
+                </div>
+
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width:45px;">#</th>
+                                <th>اسم الطالب رباعي</th>
+                                <th>كود الطالب</th>
+                                <th>المجموعة الدراسية</th>
+                                <th style="text-align:center;">الحالة الإدارية</th>
+                                <th>توقيت الحضور المعتمد</th>
+                                <th class="no-print" style="text-align:center;">إجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentTableBody"></tbody>
+                    </table>
+                </div>
+                <div id="emptyState" class="hidden" style="text-align:center; padding:30px; color:var(--text-muted); font-size:13px;">
+                    🗏 لا توجد بيانات مطابقة للتصفية الحالية.
+                    </div>
+            </div>
+
+            <div class="card hidden" id="cardsSection">
+                <div class="print-only print-header">
+                    <h2 style="font-size:18px; font-weight:800;">بطاقات حضور الطلاب (Barcode Cards) - منظومة STM</h2>
+                    <p style="font-size:12px;">المجموعة: <strong id="printCardsGroupName">-</strong></p>
+                </div>
+                <div class="card-title no-print">
+                    <span>🎴 معرض كروت الباركود الجاهزة للطباعة (A4)</span>
+                    <span style="font-size:11px; color:var(--text-muted);">تُطبع للمجموعة النشطة حالياً</span>
+                </div>
+                <div id="cardsGrid" class="qr-grid"></div>
+            </div>
+
+            <div class="card hidden" id="archiveSection">
+                <div class="print-only print-header">
+                    <h2 style="font-size:18px; font-weight:800;">سجل أرشيف الحصص الدراسية - منظومة STM</h2>
+                    <p style="font-size:12px;">تاريخ الطباعة: <strong id="printArchiveDate">-</strong></p>
+                </div>
+                <div class="card-title">
+                    <span>🗄️ سجل أرشيف الحصص المحفوظة</span>
+                    <span id="archiveCountBadge" style="font-size:12px; color:var(--text-muted);">0 حصة</span>
+                </div>
+                <div class="filter-bar no-print">
+                    <select id="archiveGroupFilter" onchange="renderArchives()" class="form-control" style="max-width:300px;">
+                        <option value="ALL">عرض أرشيف كل المجموعات</option>
+                    </select>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>التاريخ والوقت</th>
+                                <th>المجموعة الدراسية</th>
+                                <th>عنوان / ملاحظة الحصة</th>
+                                <th style="text-align:center;">الحضور</th>
+                                <th style="text-align:center;">الغياب</th>
+                                <th style="text-align:center;">النسبة</th>
+                                <th class="no-print" style="text-align:center;">عرض وطباعة</th>
+                            </tr>
+                        </thead>
+                        <tbody id="archiveTableBody"></tbody>
+                    </table>
+                </div>
+                <div id="archiveEmptyState" class="hidden" style="text-align:center; padding:30px; color:var(--text-muted); font-size:13px;">
+                    🗄️ لا توجد حصص مؤرشفة حتى الآن. استخدم زر "حفظ الحصة الحالية وبدء حصة جديدة".
+                </div>
+            </div>
+
+            <div class="card no-print" style="background:var(--bg-sub);">
+                <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:12px;">
+                    <div>
+                        <strong style="font-size:13px;">🚨 منطقة الصيانة والتصفير الجذري (للمدير العام Master فقط)</strong>
+                        <p style="font-size:11px; color:var(--text-muted); margin-top:2px;">حذف كافة المجموعات والطلاب والأرشيف لبدء عام دراسي جديد</p>
+                    </div>
+                    <button onclick="resetFullCenter()" id="resetCenterBtn" class="btn btn-danger">🚨 حذف وتصفير السنتر بالكامل</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div class="modal-backdrop no-print" id="saveSessionModal">
+        <div class="modal-box">
+            <h3 style="font-size:16px; font-weight:800; color:var(--success); margin-bottom:8px;">💾 حفظ الحصة الحالية وبدء حصة جديدة</h3>
+            <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">سيتم حفظ كشف حضور وغياب المجموعة النشطة حالياً في الأرشيف للرجوع إليه وطباعته في أي وقت، ثم إعادة تعيين حالة الطلاب إلى (غائب) للحصة القادمة.</p>
+            <div class="form-group">
+                <label class="form-label">عنوان أو ملاحظة الحصة (اختياري):</label>
+                <input type="text" id="sessionTitleInput" class="form-control" placeholder="مثال: حصة شرح الفصل الأول" onkeydown="if(event.key==='Enter') executeSaveSession()">
+            </div>
+            <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:16px;">
+                <button onclick="closeModal('saveSessionModal')" class="btn btn-outline">إلغاء</button>
+                <button onclick="executeSaveSession()" class="btn btn-success">حفظ وأرشفة وبدء حصة جديدة</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="viewArchiveModal">
+        <div class="modal-box modal-lg">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-color); padding-bottom:10px; margin-bottom:14px;">
+                <div>
+                    <h3 id="modalArchiveTitle" style="font-size:16px; font-weight:800; color:var(--primary);">تفاصيل الحصة المؤرشفة</h3>
+                    <p id="modalArchiveMeta" style="font-size:12px; color:var(--text-muted);"></p>
+                </div>
+                <div class="no-print" style="display:flex; gap:6px;">
+                    <button onclick="printArchivedSession()" class="btn btn-primary btn-sm">🖨️ طباعة هذا الكشف</button>
+                    <button onclick="closeModal('viewArchiveModal')" class="btn btn-outline btn-sm">✖ إغلاق</button>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr><th>#</th><th>اسم الطالب رباعي</th><th>كود الطالب</th><th style="text-align:center;">الحالة</th><th>توقيت التسجيل</th></tr>
+                    </thead>
+                    <tbody id="modalArchiveBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-backdrop no-print" id="settingsModal">
+        <div class="modal-box">
+            <h3 style="font-size:16px; font-weight:800; color:var(--primary); margin-bottom:8px;">⚙️ إعدادات الأمان وتغيير كلمات المرور</h3>
+            <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px;">خاص بحساب المدير العام (Master) فقط — اترك الحقل فارغاً إذا لم ترد تغييره:</p>
+            <div class="form-group">
+                <label class="form-label">كلمة مرور المدير العام الجديدة (Master):</label>
+                <input type="text" id="newMasterPassInput" class="form-control" placeholder="الافتراضية: STM2026">
+            </div>
+            <div class="form-group">
+                <label class="form-label">كلمة مرور الموظف الجديدة (Staff):</label>
+                <input type="text" id="newStaffPassInput" class="form-control" placeholder="الافتراضية: staff123">
+            </div>
+            <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:16px;">
+                <button onclick="closeModal('settingsModal')" class="btn btn-outline">إغلاق</button>
+                <button onclick="saveNewPasswords()" class="btn btn-primary">💾 حفظ كلمات المرور الجديدة</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast-msg no-print"></div>
+
+        <script>
+        const STORAGE_KEY = 'stm_attendance_v4_master_db';
+        let db = {
+            masterPass: "STM2026",
+            staffPass: "staff123",
+            groups: ["المجموعة الأولى A", "المجموعة الثانية B"],
+            currentGroup: "المجموعة الأولى A",
+            students: [],
+            archives: []
+        };
+        let currentUserRole = null, activeTab = 'all', videoStream = null, scanTimer = null, lastScannedCode = "", lastScannedTime = 0;
+
+        function saveDB() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+        }
+
+        function loadDB() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (raw) {
+                    const p = JSON.parse(raw);
+                    if (p && typeof p === 'object') {
+                        db.masterPass = p.masterPass || "STM2026";
+                        db.staffPass = p.staffPass || "staff123";
+                        db.groups = (Array.isArray(p.groups) && p.groups.length) ? p.groups : ["المجموعة الأولى A"];
+                        db.currentGroup = (typeof p.currentGroup === 'string' && db.groups.includes(p.currentGroup)) ? p.currentGroup : db.groups[0];
+                        db.students = Array.isArray(p.students) ? p.students : [];
+                        db.archives = Array.isArray(p.archives) ? p.archives : [];
+                    }
+                }
+            } catch (e) { localStorage.removeItem(STORAGE_KEY); }
+            saveDB();
+        }
+
+        function unlockSystem() {
+            loadDB();
+            const pass = (document.getElementById('loginPassInput').value || '').trim();
+            const err = document.getElementById('loginErrorMsg');
+            const badge = document.getElementById('userRoleBadge');
+            const settingsBtn = document.getElementById('settingsBtn');
+            const delGroupBtn = document.getElementById('delGroupBtn');
+            const resetCenterBtn = document.getElementById('resetCenterBtn');
+
+            if (pass === db.masterPass) {
+                currentUserRole = 'MASTER';
+                badge.textContent = "👑 الحساب: المدير العام (Master)";
+                badge.style.background = "rgba(16, 185, 129, 0.35)";
+                settingsBtn.classList.remove('hidden');
+                delGroupBtn.disabled = false;
+                resetCenterBtn.disabled = false;
+            } else if (pass === db.staffPass) {
+                currentUserRole = 'STAFF';
+                badge.textContent = "👤 الحساب: موظف تشغيل (Staff)";
+                badge.style.background = "rgba(245, 158, 11, 0.35)";
+                settingsBtn.classList.add('hidden');
+                delGroupBtn.disabled = true;
+                resetCenterBtn.disabled = true;
+            } else {
+                err.style.display = 'block';
+                return;
+            }
+
+            err.style.display = 'none';
+            document.getElementById('loginPassInput').value = '';
+            document.getElementById('loginOverlay').style.display = 'none';
+            playLoudBeep();
+            renderGroups();
+            renderStudents();
+            renderArchives();
+            document.getElementById('scanInput').focus();
+        }
+
+        function lockSystem() {
+            currentUserRole = null;
+            document.getElementById('loginOverlay').style.display = 'flex';
+            setTimeout(() => document.getElementById('loginPassInput').focus(), 100);
+        }
+
+        function openSettingsModal() {
+            if (currentUserRole !== 'MASTER') return showToast("⛔ الإعدادات متاحة للمدير العام (Master) فقط!", true);
+            document.getElementById('newMasterPassInput').value = '';
+            document.getElementById('newStaffPassInput').value = '';
+            document.getElementById('settingsModal').classList.add('show');
+        }
+
+        function saveNewPasswords() {
+            if (currentUserRole !== 'MASTER') return;
+            const m = document.getElementById('newMasterPassInput').value.trim();
+            const s = document.getElementById('newStaffPassInput').value.trim();
+            if (!m && !s) return showToast("⚠️ اكتب كلمة مرور جديدة واحدة على الأقل!", true);
+            if (m) db.masterPass = m;
+            if (s) db.staffPass = s;
+            saveDB(); closeModal('settingsModal'); playLoudBeep();
+            showToast("✅ تم تحديث كلمات المرور وحفظها بنجاح!");
+        }
+
+        function playLoudBeep() {
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                const ctx = new AudioCtx();
+                const osc = ctx.createOscillator(), gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(1100, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1400, ctx.currentTime + 0.12);
+                gain.gain.setValueAtTime(0.95, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
+                osc.connect(gain); gain.connect(ctx.destination);
+                osc.start(); osc.stop(ctx.currentTime + 0.25);
+            } catch (e) {}
+        }
+
+        function testBeepSound() { playLoudBeep(); showToast("🔊 صوت التنبيه يعمل بوضوح!"); }
+        function showToast(msg, isErr = false) {
+            const t = document.getElementById('toast');
+            t.textContent = msg; t.style.borderRightColor = isErr ? '#ef4444' : '#10b981'; t.style.display = 'block';
+            clearTimeout(window._toastT); window._toastT = setTimeout(() => { t.style.display = 'none'; }, 3500);
+        }
+        function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            document.getElementById('themeBtn').textContent = document.body.classList.contains('dark-mode') ? "☀️ النمط المضيء" : "🌙 النمط المظلم";
+        }
+        // === CLEAN_PART_1 ===
+        const CODE39_MAP = {
+            '0':'nnnwwnwnn','1':'wnnwnnnnw','2':'nnwwnnnnw','3':'wnwwnnnnn','4':'nnnwwnnnw',
+            '5':'wnnwwnnnn','6':'nnwwwnnnn','7':'nnnwnnwnw','8':'wnnwnnwnn','9':'nnwwnnwnn',
+            'A':'wnnnnwnnw','B':'nnwnnwnnw','C':'wnwnnwnnn','D':'nnnnwwnnw','E':'wnnnwwnnn',
+            'F':'nnwnwwnnn','G':'nnnnnwwnw','H':'wnnnnwwnn','I':'nnwnnwwnn','J':'nnnnwwwnn',
+            'K':'wnnnnnnww','L':'nnwnnnnww','M':'wnwnnnnwn','N':'nnnnwnnww','O':'wnnnwnnwn',
+            'P':'nnwnwnnwn','Q':'nnnnnnwww','R':'wnnnnnwwn','S':'nnwnnnwwn','T':'nnnnwnwwn',
+            'U':'wwnnnnnnw','V':'nwwnnnnnw','W':'wwwnnnnnn','X':'nwnnwnnnw','Y':'wwnnwnnnn',
+            'Z':'nwwnwnnnn','-':'nwnnnnwnw','.':'wwnnnnwnn',' ':'nwwnnnwnn','*':'nwnnwnwnn',
+            '$':'nwnwnwnnn','/':'nwnwnnnwn','+':'nwnnnwnwn','%':'nnnwnwnwn'
+        };
+
+        function drawBarcodeCard(container, rawText) {
+            container.innerHTML = '';
+            const clean = '*' + String(rawText || '0').toUpperCase().replace(/[^0-9A-Z\-\.\ \$\/\+\%]/g, '-') + '*';
+            const narrow = 2, wide = 5, gap = 2;
+            let totalWidth = 20;
+            for (let ch of clean) {
+                const pat = CODE39_MAP[ch] || CODE39_MAP['-'];
+                for (let b of pat) totalWidth += (b === 'w' ? wide : narrow);
+                totalWidth += gap;
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = totalWidth; canvas.height = 68; canvas.style.maxWidth = '100%';
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            let x = 10;
+            for (let ch of clean) {
+                const pat = CODE39_MAP[ch] || CODE39_MAP['-'];
+                for (let i = 0; i < 9; i++) {
+                    const w = (pat[i] === 'w' ? wide : narrow);
+                    if (i % 2 === 0) { ctx.fillStyle = '#0f172a'; ctx.fillRect(x, 6, w, 46); }
+                    x += w;
+                }
+                x += gap;
+            }
+            ctx.fillStyle = '#0f172a'; ctx.font = 'bold 11px monospace'; ctx.textAlign = 'center';
+            ctx.fillText(rawText, canvas.width / 2, 63);
+            container.appendChild(canvas);
+        }
+
+                                function decodeBarcodeFromFrame(videoEl) {
+            const vw = videoEl.videoWidth;
+            const vh = videoEl.videoHeight;
+            if (!vw || !vh) return null;
+
+            // القراءة بالدقة الكاملة للكاميرا بدون تصغير للحفاظ على وضوح الخطوط الرفيعة
+            const c = document.createElement('canvas');
+            const cropH = Math.floor(vh * 0.5);
+            c.width = vw;
+            c.height = cropH;
+            const ctx = c.getContext('2d');
+            ctx.drawImage(videoEl, 0, Math.floor(vh * 0.25), vw, cropH, 0, 0, vw, cropH);
+
+            const revMap = {};
+            for (let k in CODE39_MAP) revMap[CODE39_MAP[k]] = k;
+
+            // مسح 7 خطوط أفقية متقاربة في منطقة التركيز
+            const scanLines = [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8];
+            for (let ratio of scanLines) {
+                const y = Math.floor(cropH * ratio);
+                const img = ctx.getImageData(0, y, vw, 1).data;
+                let lum = [];
+                for (let i = 0; i < vw; i++) {
+                    lum.push((img.at(i * 4) + img.at(i * 4 + 1) + img.at(i * 4 + 2)) / 3);
+                }
+
+                // عتبة متكيفة محلية (Adaptive Threshold) للتغلب على انعكاس الشاشة وظلال الإضاءة
+                for (let dir of [1, -1]) {
+                    const arr = dir === 1 ? lum : lum.slice().reverse();
+                    let runs = [], cur = false, len = 0;
+
+                    for (let i = 15; i < vw - 15; i++) {
+                        let localSum = 0;
+                        for (let j = -15; j <= 15; j++) localSum += arr.at(i + j);
+                        const localAvg = (localSum / 31) - 8;
+                        const isBlack = arr.at(i) < localAvg;
+
+                        if (len === 0) { cur = isBlack; len = 1; }
+                        else if (isBlack === cur) { len++; }
+                        else { runs.push({ isBlack: cur, len }); cur = isBlack; len = 1; }
+                    }
+                    if (len > 0) runs.push({ isBlack: cur, len });
+                    if (runs.length < 19) continue;
+                    if (!runs.at(0).isBlack) runs.shift();
+
+                    let decoded = '';
+                    let valid = true;
+                    for (let i = 0; i + 8 < runs.length; i += 10) {
+                        const slice = runs.slice(i, i + 9);
+                        const sorted = slice.map(r => r.len).sort((a, b) => a - b);
+                        const mid = (sorted.at(4) + sorted.at(5)) / 2;
+                        const pat = slice.map(r => r.len > mid ? 'w' : 'n').join('');
+                        const ch = revMap[pat];
+                        if (!ch) { valid = false; break; }
+                        decoded += ch;
+                        if (decoded.length > 2 && ch === '*') break;
+                    }
+                    if (valid && decoded.startsWith('*') && decoded.endsWith('*') && decoded.length > 2) {
+                        return decoded.slice(1, -1);
+                    }
+                }
+            }
+            return null;
+        }
+        // التقاط قراءة جهاز الباركود USB تلقائياً في أي مكان داخل الصفحة
+        let usbBuffer = "", usbLastTime = 0;
+        document.addEventListener('keydown', function(e) {
+            if (currentUserRole === null) return;
+            const activeTag = document.activeElement ? document.activeElement.tagName : '';
+            if (activeTag === 'INPUT' || activeTag === 'SELECT' || activeTag === 'TEXTAREA') return;
+
+            const now = Date.now();
+            if (now - usbLastTime > 120) usbBuffer = "";
+            usbLastTime = now;
+
+            if (e.key === 'Enter' && usbBuffer.length >= 2) {
+                registerAttendanceByCode(usbBuffer);
+                usbBuffer = "";
+            } else if (e.key.length === 1) {
+                usbBuffer += e.key;
+            }
+        });
+
+        function renderGroups() {
+            const sel = document.getElementById('groupSelect');
+            const archSel = document.getElementById('archiveGroupFilter');
+            const prevArch = archSel.value;
+            sel.innerHTML = '';
+            archSel.innerHTML = '<option value="ALL">عرض أرشيف كل المجموعات</option>';
+            db.groups.forEach(g => {
+                const o = document.createElement('option');
+                o.value = g; o.textContent = g;
+                if (g === db.currentGroup) o.selected = true;
+                sel.appendChild(o);
+                const ao = document.createElement('option');
+                ao.value = g; ao.textContent = g;
+                archSel.appendChild(ao);
+            });
+            if (prevArch) archSel.value = prevArch;
+            document.getElementById('groupsCountBadge').textContent = db.groups.length + " مجموعة";
+            document.getElementById('activeGroupHeading').textContent = db.currentGroup;
+        }
+
+        function addGroup() {
+            const inp = document.getElementById('groupInput');
+            const name = inp.value.trim();
+            if (!name) return showToast("⚠️ اكتب اسم المجموعة أولاً!", true);
+            if (db.groups.includes(name)) return showToast("⚠️ هذه المجموعة موجودة بالفعل!", true);
+            db.groups.push(name);
+            db.currentGroup = name;
+            inp.value = '';
+            saveDB(); renderGroups(); renderStudents(); playLoudBeep();
+            showToast("✅ تم إضافة وتفعيل المجموعة: " + name);
+        }
+
+        function switchGroup() {
+            db.currentGroup = document.getElementById('groupSelect').value;
+            saveDB(); renderGroups(); renderStudents();
+        }
+
+        function deleteActiveGroup() {
+            if (currentUserRole !== 'MASTER') return showToast("⛔ حذف المجموعات متاح لحساب المدير العام (Master) فقط!", true);
+            if (!confirm(`هل أنت متأكد من حذف المجموعة "${db.currentGroup}" وجميع طلابها نهائياً؟`)) return;
+            const deleted = db.currentGroup;
+            db.students = db.students.filter(s => s.group !== deleted);
+            db.groups = db.groups.filter(g => g !== deleted);
+            if (db.groups.length === 0) db.groups = ["المجموعة العامة الأولى"];
+            db.currentGroup = db.groups[0];
+            saveDB(); renderGroups(); renderStudents();
+            showToast(`🗑️ تم حذف المجموعة "${deleted}" بنجاح`);
+        }
+
+        function generateAutoCode() {
+            document.getElementById('studentCodeInput').value = "STM-" + Math.floor(10000 + Math.random() * 90000);
+        }
+
+        function addStudent() {
+            const nInp = document.getElementById('studentNameInput');
+            const cInp = document.getElementById('studentCodeInput');
+            const name = nInp.value.trim(), code = cInp.value.trim();
+            if (!name || !code) return showToast("⚠️ أدخل اسم الطالب وكود التميز معاً!", true);
+            if (db.students.some(s => String(s.code).toLowerCase() === code.toLowerCase() && s.group === db.currentGroup)) {
+                return showToast("⚠️ هذا الكود مسجل لطالب آخر في نفس المجموعة!", true);
+            }
+            db.students.push({ name, code, group: db.currentGroup, status: 'غائب', timestamp: '-' });
+            nInp.value = ''; cInp.value = '';
+            saveDB(); renderStudents(); playLoudBeep();
+            showToast(`✨ تم إدراج الطالب (${name}) وتوليد كارت الباركود`);
+        }
+        // === CLEAN_PART_2 ===
+        function registerAttendanceByCode(raw) {
+            const code = String(raw || '').trim();
+            if (!code || (code === lastScannedCode && Date.now() - lastScannedTime < 2500)) return;
+            lastScannedCode = code; lastScannedTime = Date.now();
+            const student = db.students.find(s => String(s.code).toLowerCase() === code.toLowerCase() && s.group === db.currentGroup);
+            if (!student) return showToast(`❌ الكود (${code}) غير مسجل في المجموعة النشطة!`, true);
+            if (student.status === 'حاضر') { playLoudBeep(); return showToast(`ℹ️ الطالب (${student.name}) مسجل حضور بالفعل!`); }
+            student.status = 'حاضر';
+            const now = new Date();
+            student.timestamp = now.toLocaleDateString('ar-EG') + ' - ' + now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            playLoudBeep(); saveDB(); renderStudents();
+            showToast(`✅ تم تسجيل حضور: ${student.name}`);
+        }
+
+        function triggerManualScan() {
+            const inp = document.getElementById('scanInput');
+            if (!inp.value.trim()) return showToast("⚠️ مرر الكارت أو اكتب الكود أولاً!", true);
+            registerAttendanceByCode(inp.value.trim());
+            inp.value = ''; inp.focus();
+        }
+
+        function toggleStudentStatus(code) {
+            const s = db.students.find(x => x.code === code && x.group === db.currentGroup);
+            if (!s) return;
+            if (s.status === 'غائب') {
+                s.status = 'حاضر';
+                const now = new Date();
+                s.timestamp = now.toLocaleDateString('ar-EG') + ' - ' + now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                playLoudBeep(); showToast(`✅ حضور يدوي: ${s.name}`);
+            } else { s.status = 'غائب'; s.timestamp = '-'; showToast(`🔄 تغيير الحالة لغائب: ${s.name}`); }
+            saveDB(); renderStudents();
+        }
+
+        function editStudentName(code) {
+            const s = db.students.find(x => x.code === code && x.group === db.currentGroup);
+            const n = s ? prompt("تعديل اسم الطالب رباعي:", s.name) : null;
+            if (n && n.trim()) { s.name = n.trim(); saveDB(); renderStudents(); showToast("✏️ تم تعديل اسم الطالب"); }
+        }
+
+        function deleteStudent(code) {
+            if (currentUserRole !== 'MASTER') return showToast("⛔ حذف الطلاب متاح لحساب المدير العام (Master) فقط!", true);
+            if (!confirm("هل تريد حذف هذا الطالب نهائياً؟")) return;
+            db.students = db.students.filter(x => !(x.code === code && x.group === db.currentGroup));
+            saveDB(); renderStudents(); showToast("🗑️ تم حذف الطالب");
+        }
+
+        async function startCameraScanner() {
+            const video = document.getElementById('qrVideo'), ph = document.getElementById('cameraPlaceholder'), line = document.getElementById('scanLine');
+            try {
+                videoStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+                video.srcObject = videoStream; await video.play();
+                video.style.display = 'block'; ph.style.display = 'none'; line.style.display = 'block';
+                document.getElementById('startCamBtn').classList.add('hidden');
+                document.getElementById('stopCamBtn').classList.remove('hidden');
+                scanTimer = setInterval(() => {
+                    if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                        const code = decodeBarcodeFromFrame(video);
+                        if (code) registerAttendanceByCode(code);
+                    }
+                }, 250);
+                showToast("📷 الكاميرا تعمل الآن وجاهزة لمسح باركود الكروت تلقائياً");
+            } catch (e) { showToast("⚠️ لم يتم العثور على كاميرا متصلة. استخدم قارئ الباركود USB أو الإدخال اليدوي.", true); }
+        }
+
+        function stopCameraScanner() {
+            if (scanTimer) clearInterval(scanTimer);
+            if (videoStream) { videoStream.getTracks().forEach(t => t.stop()); videoStream = null; }
+            document.getElementById('qrVideo').style.display = 'none';
+            document.getElementById('scanLine').style.display = 'none';
+            document.getElementById('cameraPlaceholder').style.display = 'block';
+            document.getElementById('startCamBtn').classList.remove('hidden');
+            document.getElementById('stopCamBtn').classList.add('hidden');
+        }
+
+        function switchTab(tab) {
+            activeTab = tab;
+            ['all', 'cards', 'archive'].forEach(t => document.getElementById(`tab-${t}`).classList.toggle('active', t === tab));
+            document.getElementById('tableSection').classList.toggle('hidden', tab !== 'all');
+            document.getElementById('cardsSection').classList.toggle('hidden', tab !== 'cards');
+            document.getElementById('archiveSection').classList.toggle('hidden', tab !== 'archive');
+            if (tab === 'archive') renderArchives();
+            else renderStudents();
+        }
+
+        function renderStudents() {
+            const tbody = document.getElementById('studentTableBody');
+            const grid = document.getElementById('cardsGrid');
+            const q = document.getElementById('searchInput').value.trim().toLowerCase();
+            const groupMode = document.getElementById('filterGroupMode').value;
+            const statusMode = document.getElementById('filterStatusMode').value;
+            const sort = document.getElementById('sortSelect').value;
+
+            document.getElementById('activeGroupHeading').textContent = (groupMode === 'ALL') ? "جميع المجموعات الدراسية" : db.currentGroup;
+
+            let list = db.students.filter(s => {
+                if (groupMode === 'ACTIVE' && s.group !== db.currentGroup) return false;
+                if (statusMode === 'PRESENT' && s.status !== 'حاضر') return false;
+                if (statusMode === 'ABSENT' && s.status !== 'غائب') return false;
+                if (q && !s.name.toLowerCase().includes(q) && !String(s.code).toLowerCase().includes(q)) return false;
+                return true;
+            });
+
+            const pC = list.filter(s => s.status === 'حاضر').length;
+            document.getElementById('statsSummary').textContent = `المعروض: ${list.length} | حاضر: ${pC} | غائب: ${list.length - pC}`;
+
+            const nowStr = new Date().toLocaleDateString('ar-EG') + ' ' + new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('printGroupName').textContent = (groupMode === 'ALL') ? "جميع المجموعات" : db.currentGroup;
+            document.getElementById('printCardsGroupName').textContent = db.currentGroup;
+            document.getElementById('printDate').textContent = nowStr;
+            document.getElementById('printFilterName').textContent = { ALL: 'الكل (حاضر + غائب)', PRESENT: 'الحاضرون فقط', ABSENT: 'الغائبون فقط' }[statusMode];
+
+            if (sort === 'name_asc') list.sort((a, b) => a.name.localeCompare(b.name, 'ar'));
+            else if (sort === 'name_desc') list.sort((a, b) => b.name.localeCompare(a.name, 'ar'));
+            else if (sort === 'group_asc') list.sort((a, b) => a.group.localeCompare(b.group, 'ar'));
+            else if (sort === 'code_asc') list.sort((a, b) => String(a.code).localeCompare(String(b.code), undefined, { numeric: true }));
+            else if (sort === 'status_present') list.sort((a, b) => (a.status === 'حاضر' ? -1 : 1));
+            else if (sort === 'status_absent') list.sort((a, b) => (a.status === 'غائب' ? -1 : 1));
+
+            tbody.innerHTML = '';
+            document.getElementById('emptyState').classList.toggle('hidden', list.length > 0);
+
+            list.forEach((s, i) => {
+                const tr = document.createElement('tr');
+                const pill = s.status === 'حاضر' ? 'status-present' : 'status-absent';
+                const delBtn = (currentUserRole === 'MASTER') ? `<button onclick="deleteStudent('${s.code}')" class="btn btn-danger btn-sm">حذف</button>` : '';
+                tr.innerHTML = `
+                    <td style="font-weight:700; color:var(--text-muted);">${i + 1}</td>
+                    <td style="font-weight:700;">${s.name}</td>
+                    <td style="font-family:monospace; font-weight:700;">${s.code}</td>
+                    <td style="font-size:12px; color:var(--primary); font-weight:700;">${s.group}</td>
+                    <td style="text-align:center;"><span onclick="toggleStudentStatus('${s.code}')" class="status-pill ${pill}">${s.status}</span></td>
+                    <td style="font-family:monospace; font-size:12px; color:var(--text-muted);">${s.timestamp}</td>
+                    <td class="no-print" style="text-align:center; white-space:nowrap;">
+                        <button onclick="editStudentName('${s.code}')" class="btn btn-outline btn-sm">تعديل</button>
+                        ${delBtn}
+                    </td>`;
+                tbody.appendChild(tr);
+            });
+
+            if (activeTab === 'cards') {
+                grid.innerHTML = '';
+                const cardsList = db.students.filter(s => s.group === db.currentGroup);
+                cardsList.forEach(s => {
+                    const card = document.createElement('div');
+                    card.className = 'qr-card';
+                    card.innerHTML = `
+                        <div style="width:100%; border-bottom:1px solid var(--border-color); padding-bottom:6px;">
+                            <div style="font-size:13px; font-weight:800;">${s.name}</div>
+                            <div style="font-size:10px; color:var(--text-muted); margin-top:2px;">${s.group}</div>
+                        </div>
+                        <div class="qr-canvas-box"></div>
+                        <div style="font-size:9px; color:var(--text-muted);">STM ATTENDANCE CARD</div>`;
+                    grid.appendChild(card);
+                    drawBarcodeCard(card.querySelector('.qr-canvas-box'), s.code);
+                });
+            }
+        }
+
+        function openSaveSessionModal() {
+            const list = db.students.filter(s => s.group === db.currentGroup);
+            if (list.length === 0) return showToast("⚠️ لا يوجد طلاب في المجموعة النشطة لحفظ حصتهم!", true);
+            document.getElementById('sessionTitleInput').value = '';
+            document.getElementById('saveSessionModal').classList.add('show');
+            setTimeout(() => document.getElementById('sessionTitleInput').focus(), 100);
+        }
+
+        function executeSaveSession() {
+            const list = db.students.filter(s => s.group === db.currentGroup);
+            if (list.length === 0) return;
+            const title = document.getElementById('sessionTitleInput').value.trim() || "حصة دراسية اعتيادية";
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('ar-EG') + ' - ' + now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+            const pC = list.filter(s => s.status === 'حاضر').length;
+
+            db.archives.unshift({
+                id: Date.now(), date: dateStr, group: db.currentGroup, title: title,
+                presentCount: pC, absentCount: list.length - pC,
+                rate: Math.round((pC / list.length) * 100), records: JSON.parse(JSON.stringify(list))
+            });
+
+            db.students.forEach(s => {
+                if (s.group === db.currentGroup) { s.status = 'غائب'; s.timestamp = '-'; }
+            });
+
+            saveDB(); closeModal('saveSessionModal'); renderStudents(); renderArchives(); playLoudBeep();
+            showToast("💾 تم حفظ الحصة في الأرشيف وبدء حصة جديدة بنجاح!");
+        }
+
+        function renderArchives() {
+            const tbody = document.getElementById('archiveTableBody');
+            const f = document.getElementById('archiveGroupFilter').value;
+            document.getElementById('printArchiveDate').textContent = new Date().toLocaleDateString('ar-EG');
+
+            const list = (f && f !== 'ALL') ? db.archives.filter(a => a.group === f) : db.archives;
+            document.getElementById('archiveCountBadge').textContent = `${list.length} حصة مؤرشفة`;
+            tbody.innerHTML = '';
+            document.getElementById('archiveEmptyState').classList.toggle('hidden', list.length > 0);
+
+            list.forEach((a, i) => {
+                const delArchBtn = (currentUserRole === 'MASTER')
+                    ? `<button onclick="deleteArchive(${a.id})" class="btn btn-danger btn-sm">🗑️</button>` : '';
+                tbody.innerHTML += `<tr>
+                    <td style="font-weight:700;">${i + 1}</td>
+                    <td style="font-family:monospace; font-size:12px;">${a.date}</td>
+                    <td style="font-weight:700;">${a.group}</td>
+                    <td>${a.title}</td>
+                    <td style="text-align:center; color:var(--success); font-weight:800;">${a.presentCount}</td>
+                    <td style="text-align:center; color:var(--danger); font-weight:800;">${a.absentCount}</td>
+                    <td style="text-align:center; font-weight:700;">${a.rate}%</td>
+                    <td class="no-print" style="text-align:center; white-space:nowrap;">
+                        <button onclick="viewArchive(${a.id})" class="btn btn-primary btn-sm">👁️ عرض / طباعة</button>
+                        ${delArchBtn}
+                    </td></tr>`;
+            });
+        }
+
+        function viewArchive(id) {
+            const a = db.archives.find(x => x.id === id);
+            if (!a) return;
+            document.getElementById('modalArchiveTitle').textContent = `${a.group} — ${a.title}`;
+            document.getElementById('modalArchiveMeta').textContent = `التاريخ: ${a.date} | الحضور: ${a.presentCount} | الغياب: ${a.absentCount} | النسبة: ${a.rate}%`;
+            const tbody = document.getElementById('modalArchiveBody');
+            tbody.innerHTML = '';
+            a.records.forEach((r, i) => {
+                tbody.innerHTML += `<tr>
+                    <td>${i + 1}</td><td style="font-weight:700;">${r.name}</td><td style="font-family:monospace;">${r.code}</td>
+                    <td style="text-align:center;"><span class="status-pill ${r.status === 'حاضر' ? 'status-present' : 'status-absent'}">${r.status}</span></td>
+                    <td style="font-family:monospace; font-size:12px;">${r.timestamp}</td></tr>`;
+            });
+            document.getElementById('viewArchiveModal').classList.add('show');
+        }
+
+        function printArchivedSession() {
+            const win = window.open('', '', 'width=900,height=700');
+            win.document.write(`<html lang="ar" dir="rtl"><head><title>كشف حصة مؤرشفة - STM</title><style>body{font-family:Tahoma;padding:20px}h2,p{text-align:center}table{width:100%;border-collapse:collapse;margin-top:15px}th,td{border:1px solid #000;padding:8px;text-align:right}</style></head><body><h2>منظومة STM - كشف حضور وغياب حصة مؤرشفة</h2><p><strong>${document.getElementById('modalArchiveTitle').textContent}</strong><br>${document.getElementById('modalArchiveMeta').textContent}</p>${document.getElementById('modalArchiveBody').parentElement.outerHTML}</body></html>`);
+            win.document.close(); win.focus(); win.print(); win.close();
+        }
+
+        function deleteArchive(id) {
+            if (currentUserRole !== 'MASTER') return showToast("⛔ حذف الأرشيف متاح للمدير العام (Master) فقط!", true);
+            if (!confirm("هل تريد حذف سجل هذه الحصة من الأرشيف؟")) return;
+            db.archives = db.archives.filter(x => x.id !== id);
+            saveDB(); renderArchives(); showToast("🗑️ تم حذف سجل الحصة من الأرشيف");
+        }
+
+        function resetFullCenter() {
+            if (currentUserRole !== 'MASTER') return showToast("⛔ تصفير السنتر بالكامل متاح لحساب المدير العام (Master) فقط!", true);
+            if (!confirm("🚨 تحذير صارم: هل أنت متأكد من حذف جميع المجموعات والطلاب والأرشيف بالكامل؟")) return;
+            if (!confirm("تأكيد أخير: لا يمكن التراجع عن هذا المسح!")) return;
+            const savedM = db.masterPass, savedS = db.staffPass;
+            db = { masterPass: savedM, staffPass: savedS, groups: ["المجموعة الأولى A"], currentGroup: "المجموعة الأولى A", students: [], archives: [] };
+            saveDB(); renderGroups(); renderStudents(); renderArchives();
+            showToast("🚨 تم حذف وتصفير السنتر بالكامل بنجاح.");
+        }
+
+        function exportData() {
+            const a = document.createElement('a');
+            a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db, null, 2));
+            a.download = `STM_Attendance_Pro_${new Date().toISOString().slice(0, 10)}.json`;
+            document.body.appendChild(a); a.click(); a.remove();
+            showToast("📤 تم تصدير النسخة الاحتياطية الكاملة بنجاح");
+        }
+
+                function importData(ev) {
+            const file = ev.target.files && ev.target.files[0];
+            if (!file) return;
+            const r = new FileReader();
+            r.onload = function(e) {
+                try {
+                    const d = JSON.parse(e.target.result);
+                    if (d && Array.isArray(d.groups) && Array.isArray(d.students)) {
+                        db.groups = d.groups.length ? d.groups : ["المجموعة الأولى A"];
+                        db.currentGroup = (typeof d.currentGroup === 'string' && db.groups.includes(d.currentGroup)) ? d.currentGroup : db.groups[0];
+                        db.students = d.students;
+                        db.archives = Array.isArray(d.archives) ? d.archives : [];
+                        if (d.masterPass) db.masterPass = d.masterPass;
+                        if (d.staffPass) db.staffPass = d.staffPass;
+
+                        saveDB();
+                        renderGroups();
+                        renderStudents();
+                        renderArchives();
+                        playLoudBeep();
+                        showToast("📥 تم استيراد البيانات والأرشيف بنجاح تام!");
+                    } else {
+                        showToast("❌ هذا الملف لا يحتوي على بيانات نظام STM صالحة!", true);
+                    }
+                } catch (err) {
+                    showToast("❌ تعذر قراءة الملف؛ تأكد أنه ملف JSON سليم!", true);
+                }
+                ev.target.value = '';
+            };
+            r.readAsText(file);
+        }
+
+
+        window.onload = function() {
+            loadDB();
+            setTimeout(() => { const inp = document.getElementById('loginPassInput'); if (inp) inp.focus(); }, 100);
+        };
+    </script>
+    <!-- محقن المعاينة التفاعلية المحمية (Read-Only Demo Guard) -->
+    <div id="demoAlertModal" style="position:fixed; inset:0; background:rgba(15,23,42,0.8); z-index:999999; display:none; align-items:center; justify-content:center; padding:16px;">
+        <div style="background:#ffffff; color:#0f172a; border-radius:16px; width:100%; max-width:420px; padding:26px; text-align:center; box-shadow:0 20px 40px rgba(0,0,0,0.4); border-top:5px solid #d97706;">
+            <div style="font-size:42px; margin-bottom:8px;">🔒</div>
+            <h3 style="font-size:18px; font-weight:800; color:#1e3a8a; margin-bottom:8px;">هذه نسخة معاينة للمشاهدة فقط</h3>
+            <p style="font-size:13px; color:#475569; line-height:1.6; margin-bottom:18px;">
+                لا يمكن إضافة أو تعديل أو حذف أو طباعة البيانات في نسخة العرض الأونلاين.<br>
+                للحصول على <strong>النسخة الكاملة العاملة بدون إنترنت 100%</strong> والمحمية بفلاشة الأمان الخاصة بسنترك، تواصل معنا الآن:
+            </p>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+                <a href="https://wa.me،%20أرغب%20في%20الحصول%20على%20النسخة%20الكاملة%20من%20منظومة%20STM" target="_blank" style="background:#16a34a; color:#ffffff; text-decoration:none; padding:11px; border-radius:10px; font-size:14px; font-weight:800;">
+                    💬 اطلب النسخة الكاملة عبر واتساب الآن
+                </a>
+                <button onclick="document.getElementById('demoAlertModal').style.display='none'" style="background:#f1f5f9; color:#334155; border:1px solid #cbd5e1; padding:9px; border-radius:10px; font-size:13px; font-weight:700; cursor:pointer; font-family:inherit;">
+                    متابعة تصفح المعاينة
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function initAttendanceDemoMode() {
+            // 1. تعبئة بيانات تجريبية احترافية للمعاينة
+            const demoData = {
+                masterPass: "DEMO",
+                staffPass: "DEMO",
+                groups: ["فيزياء - الصف الثالث الثانوي (السبت 4م)", "كيمياء - الصف الثاني الثانوي (الأحد 6م)"],
+                currentGroup: "فيزياء - الصف الثالث الثانوي (السبت 4م)",
+                students: [
+                    { name: "أحمد محمود عبد الرحمن", code: "1001", group: "فيزياء - الصف الثالث الثانوي (السبت 4م)", status: "حاضر", timestamp: "2026/11/18 - 04:05:12 م" },
+                    { name: "سارة إبراهيم محمد علي", code: "1002", group: "فيزياء - الصف الثالث الثانوي (السبت 4م)", status: "حاضر", timestamp: "2026/11/18 - 04:07:45 م" },
+                    { name: "يوسف خالد حسن مصطفى", code: "1003", group: "فيزياء - الصف الثالث الثانوي (السبت 4م)", status: "غائب", timestamp: "-" },
+                    { name: "مريم طارق سعيد السيد", code: "1004", group: "فيزياء - الصف الثالث الثانوي (السبت 4م)", status: "حاضر", timestamp: "2026/11/18 - 04:11:20 م" },
+                    { name: "عمر وليد فؤاد محمود", code: "1005", group: "فيزياء - الصف الثالث الثانوي (السبت 4م)", status: "غائب", timestamp: "-" },
+                    { name: "نور الهدى أشرف كامل", code: "2001", group: "كيمياء - الصف الثاني الثانوي (الأحد 6م)", status: "حاضر", timestamp: "2026/11/18 - 06:02:10 م" },
+                    { name: "زياد هشام عبد العزيز", code: "2002", group: "كيمياء - الصف الثاني الثانوي (الأحد 6م)", status: "غائب", timestamp: "-" }
+                ],
+                archives: [
+                    {
+                        id: 170001,
+                        date: "2026/11/11 - 05:30 م",
+                        group: "فيزياء - الصف الثالث الثانوي (السبت 4م)",
+                        title: "مراجعة الفصل الأول + اختبار قصير",
+                        presentCount: 4,
+                        absentCount: 1,
+                        rate: 80,
+                        records: [
+                            { name: "أحمد محمود عبد الرحمن", code: "1001", status: "حاضر", timestamp: "04:02 م" },
+                            { name: "سارة إبراهيم محمد علي", code: "1002", status: "حاضر", timestamp: "04:04 م" },
+                            { name: "يوسف خالد حسن مصطفى", code: "1003", status: "حاضر", timestamp: "04:09 م" },
+                            { name: "مريم طارق سعيد السيد", code: "1004", status: "حاضر", timestamp: "04:10 م" },
+                            { name: "عمر وليد فؤاد محمود", code: "1005", status: "غائب", timestamp: "-" }
+                        ]
+                    }
+                ]
+            };
+
+            function showDemoBlocked() {
+                document.getElementById('demoAlertModal').style.display = 'flex';
+            }
+
+            // 2. تجاوز شاشة القفل تلقائياً وعرض البيانات التجريبية
+            window.addEventListener('load', function() {
+                db = demoData;
+                currentUserRole = 'MASTER';
+                const overlay = document.getElementById('loginOverlay');
+                if (overlay) overlay.style.display = 'none';
+                const badge = document.getElementById('userRoleBadge');
+                if (badge) badge.textContent = "👁️ وضع المعاينة (للمشاهدة فقط)";
+                const settingsBtn = document.getElementById('settingsBtn');
+                if (settingsBtn) settingsBtn.classList.remove('hidden');
+
+                renderGroups();
+                renderStudents();
+                renderArchives();
+            });
+
+            // 3. قفل دوال التعديل والحفظ والطباعة وتحويلها لنافذة المعاينة
+            window.saveDB = function() {};
+            window.addGroup = showDemoBlocked;
+            window.deleteActiveGroup = showDemoBlocked;
+            window.addStudent = showDemoBlocked;
+            window.registerAttendanceByCode = showDemoBlocked;
+            window.triggerManualScan = showDemoBlocked;
+            window.toggleStudentStatus = showDemoBlocked;
+            window.editStudentName = showDemoBlocked;
+            window.deleteStudent = showDemoBlocked;
+            window.startCameraScanner = showDemoBlocked;
+            window.openSaveSessionModal = showDemoBlocked;
+            window.executeSaveSession = showDemoBlocked;
+            window.deleteArchive = showDemoBlocked;
+            window.resetFullCenter = showDemoBlocked;
+            window.exportData = showDemoBlocked;
+            window.importData = showDemoBlocked;
+            window.openSettingsModal = showDemoBlocked;
+            window.saveNewPasswords = showDemoBlocked;
+            window.lockSystem = showDemoBlocked;
+            window.print = showDemoBlocked;
+            window.printArchivedSession = showDemoBlocked;
+
+            // حماية الكود المصدري في نسخة الأونلاين
+            document.addEventListener('contextmenu', e => e.preventDefault());
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'F12' || (e.ctrlKey && ['u','U','s','S','p','P'].includes(e.key))) {
+                    e.preventDefault();
+                    if (e.key === 'p' || e.key === 'P') showDemoBlocked();
+                }
+            });
+        })();
+    </script>
+
+</body>
+</html>

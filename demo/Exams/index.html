@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>نظام إدارة الامتحانات الذكي</title>
+    <style>
+        :root {
+            --bg-color: #f4f6f9;
+            --container-bg: #ffffff;
+            --text-color: #333333;
+            --header-bg: #2c3e50;
+            --header-text: #ffffff;
+            --table-border: #e0e0e0;
+            --btn-primary: #007bff;
+            --btn-hover: #0056b3;
+            --input-bg: #ffffff;
+            --input-border: #cccccc;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --container-bg: #2d2d2d;
+            --text-color: #e0e0e0;
+            --header-bg: #111111;
+            --header-text: #ffffff;
+            --table-border: #444444;
+            --btn-primary: #375a7f;
+            --btn-hover: #2b4764;
+            --input-bg: #3a3a3a;
+            --input-border: #555555;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .header-banner {
+            background-color: var(--header-bg);
+            color: var(--header-text);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .header-banner h2 { margin: 0 0 10px 0; font-size: 24px; }
+        .header-banner p { margin: 5px 0; font-size: 14px; direction: ltr; }
+
+        .container {
+            background-color: var(--container-bg);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        .top-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        .btn:active { transform: scale(0.98); }
+        .btn-primary { background-color: var(--btn-primary); color: white; }
+        .btn-primary:hover { background-color: var(--btn-hover); }
+        .btn-theme { background-color: #6c757d; color: white; }
+        .btn-theme:hover { background-color: #5a6268; }
+        .btn-danger { background-color: #dc3545; color: white; }
+        .btn-danger:hover { background-color: #bd2130; }
+        .btn-success { background-color: #28a745; color: white; padding: 5px 10px; font-size: 12px; }
+        .btn-success:hover { background-color: #218838; }
+
+        .filter-section {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        select, input {
+            padding: 8px 12px;
+            border: 1px solid var(--input-border);
+            border-radius: 5px;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            font-size: 14px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            border: 1px solid var(--table-border);
+            padding: 12px;
+            text-align: center;
+        }
+
+        th {
+            background-color: var(--header-bg);
+            color: var(--header-text);
+        }
+
+        tr:nth-child(even) { background-color: rgba(0,0,0,0.02); }
+
+        .status-active { background-color: #d4edda !important; color: #155724; font-weight: bold; border-radius: 4px; padding: 4px 8px; }
+        .status-closed { background-color: #e2e3e5 !important; color: #383d41; font-weight: bold; border-radius: 4px; padding: 4px 8px; }
+        .status-postponed { background-color: #fff3cd !important; color: #856404; font-weight: bold; border-radius: 4px; padding: 4px 8px; }
+
+        .link-text {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .link-text:hover { text-decoration: underline; }
+        [data-theme="dark"] .link-text { color: #4da3ff; }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            justify-content: center; align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background-color: var(--container-bg);
+            padding: 25px;
+            border-radius: 8px;
+            width: 500px;
+            max-width: 90%;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .modal-content h3 { margin-top: 0; }
+        .form-group {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- الترويسة الثابتة الخاصة بالمعلم -->
+    <div class="header-banner">
+        <h2>منظومة إدارة الامتحانات الرقمية الذكية</h2>
+        <p>STM-TEL: 00201000009721 &nbsp;&nbsp;|&nbsp;&nbsp; Email: khaledshouab2@gmail.com</p>
+    </div>
+
+    <div class="container">
+        <div class="top-controls">
+            <button class="btn btn-primary" onclick="openModal()">➕ إضافة امتحان جديد</button>
+            
+            <div class="filter-section">
+                <label>تصفية حسب المرحلة:</label>
+                <select id="gradeFilter" onchange="renderTable()">
+                    <option value="all">كل المراحل</option>
+                    <option value="الصف الأول الثانوي">الصف الأول الثانوي</option>
+                    <option value="الصف الثاني الثانوي">الصف الثاني الثانوي</option>
+                    <option value="الصف الثالث الثانوي">الصف الثالث الثانوي</option>
+                </select>
+                <button class="btn btn-theme" onclick="toggleTheme()">🌓 تبديل الوضع</button>
+            </div>
+        </div>
+
+        <table id="examsTable">
+            <thead>
+                <tr>
+                    <th>اسم الامتحان</th>
+                    <th>المرحلة الدراسية</th>
+                    <th>الرابط الماستر (التحكم)</th>
+                    <th>رابط الطلاب (شير)</th>
+                    <th>شيت الإجابات (اكسل)</th>
+                    <th>رابط النتيجة النهائي</th>
+                    <th>الحالة</th>
+                    <th>الإجراءات</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <!-- البيانات تظهر هنا برمجياً -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- نافذة إضافة وتعديل امتحان -->
+    <div id="examModal" class="modal">
+        <div class="modal-content">
+            <h3 id="modalTitle">إضافة امتحان جديد</h3>
+            <input type="hidden" id="editIndex" value="">
+            
+            <div class="form-group">
+                <label>اسم الامتحان:</label>
+                <input type="text" id="examName" required placeholder="مثال: امتحان شهر أكتوبر">
+            </div>
+            <div class="form-group">
+                <label>المرحلة الدراسية:</label>
+                <select id="examGrade">
+                    <option value="الصف الأول الثانوي">الصف الأول الثانوي</option>
+                    <option value="الصف الثاني الثانوي">الصف الثاني الثانوي</option>
+                    <option value="الصف الثالث الثانوي">الصف الثالث الثانوي</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>الرابط الماستر (التحكم الخاص بك):</label>
+                <input type="url" id="masterLink" placeholder="https://docs.google.com/forms/d/.../edit">
+            </div>
+            <div class="form-group">
+                <label>رابط الطلاب (شير):</label>
+                <input type="url" id="shareLink" placeholder="https://docs.google.com/forms/d/e/.../viewform">
+            </div>
+            <div class="form-group">
+                <label>شيت الإجابات والدرجات (جوجل شيت):</label>
+                <input type="url" id="sheetLink" placeholder="https://docs.google.com/spreadsheets/d/.../edit">
+            </div>
+            <div class="form-group">
+                <label>رابط النتيجة النهائي:</label>
+                <input type="url" id="resultLink" placeholder="رابط لوحة النتيجة أو تقرير جوجل">
+            </div>
+            <div class="form-group">
+                <label>حالة الامتحان:</label>
+                <select id="examStatus">
+                    <option value="نشط">نشط</option>
+                    <option value="مغلق">مغلق</option>
+                    <option value="مؤجل">مؤجل</option>
+                </select>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn btn-theme" onclick="closeModal()">إلغاء</button>
+                <button class="btn btn-primary" onclick="saveExam()">حفظ البيانات</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // مصفوفة البيانات الأساسية المخزنة محلياً لعدم الضياع
+        let exams = JSON.parse(localStorage.getItem('exams_data')) || [
+            {
+                name: "امتحان الميكانيكا التجريبي",
+                grade: "الصف الثالث الثانوي",
+                master: "https://docs.google.com/forms",
+                share: "https://docs.google.com/forms",
+                sheet: "https://docs.google.com/spreadsheets",
+                result: "https://docs.google.com/spreadsheets",
+                status: "نشط"
+            }
+        ];
+
+        // وظيفة تصفية ورسم الجدول
+        function renderTable() {
+            const tableBody = document.getElementById('tableBody');
+            const filterValue = document.getElementById('gradeFilter').value;
+            tableBody.innerHTML = '';
+
+            exams.forEach((exam, index) => {
+                if (filterValue !== 'all' && exam.grade !== filterValue) return;
+
+                let statusClass = 'status-active';
+                if (exam.status === 'مغلق') statusClass = 'status-closed';
+                if (exam.status === 'مؤجل') statusClass = 'status-postponed';
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>${exam.name}</strong></td>
+                    <td>${exam.grade}</td>
+                    <td><span class="link-text" onclick="window.open('${exam.master}', '_blank', 'width=1200,height=800')">⚙️ فتح التعديل</span></td>
+                    <td>
+                        <span class="link-text" onclick="window.open('${exam.share}', '_blank', 'width=1200,height=800')">🔗 فتح الرابط</span>
+                        <br><button class="btn btn-success" style="margin-top:5px;" onclick="copyToClipboard('${exam.share}')">📋 نسخ الرابط</button>
+                    </td>
+                    <td><span class="link-text" onclick="window.open('${exam.sheet}', '_blank', 'width=1200,height=800')">📊 شيت الدرجات</span></td>
+                    <td><span class="link-text" onclick="window.open('${exam.result}', '_blank', 'width=1200,height=800')">📜 تقرير النتيجة</span></td>
+                    <td><span class="${statusClass}">${exam.status}</span></td>
+                    <td>
+                        <button class="btn btn-theme" style="padding: 5px 10px; font-size:12px;" onclick="openModal(${index})">تعديل</button>
+                        <button class="btn btn-danger" style="padding: 5px 10px; font-size:12px;" onclick="deleteExam(${index})">حذف</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // حفظ البيانات في الذاكرة المحلية للكمبيوتر أو الفلاشة
+        function saveToStorage() {
+            localStorage.setItem('exams_data', JSON.stringify(exams));
+        }
+
+        // فتح نافذة الإضافة أو التعديل
+        function openModal(index = null) {
+            const modal = document.getElementById('examModal');
+            modal.style.display = 'flex';
+            
+            if (index !== null) {
+                document.getElementById('modalTitle').innerText = 'تعديل بيانات الامتحان';
+                document.getElementById('editIndex').value = index;
+                document.getElementById('examName').value = exams[index].name;
+                document.getElementById('examGrade').value = exams[index].grade;
+                document.getElementById('masterLink').value = exams[index].master;
+                document.getElementById('shareLink').value = exams[index].share;
+                document.getElementById('sheetLink').value = exams[index].sheet;
+                document.getElementById('resultLink').value = exams[index].result;
+                document.getElementById('examStatus').value = exams[index].status;
+            } else {
+                document.getElementById('modalTitle').innerText = 'إضافة امتحان جديد';
+                document.getElementById('editIndex').value = '';
+                document.getElementById('examName').value = '';
+                document.getElementById('masterLink').value = '';
+                document.getElementById('shareLink').value = '';
+                document.getElementById('sheetLink').value = '';
+                document.getElementById('resultLink').value = '';
+                document.getElementById('examStatus').value = 'نشط';
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('examModal').style.display = 'none';
+        }
+
+        // حفظ الامتحان (إضافة جديدة أو تعديل قديم)
+        function saveExam() {
+            const index = document.getElementById('editIndex').value;
+            const examData = {
+                name: document.getElementById('examName').value || 'امتحان بدون اسم',
+                grade: document.getElementById('examGrade').value,
+                master: document.getElementById('masterLink').value || '#',
+                share: document.getElementById('shareLink').value || '#',
+                sheet: document.getElementById('sheetLink').value || '#',
+                result: document.getElementById('resultLink').value || '#',
+                status: document.getElementById('examStatus').value
+            };
+
+            if (index !== '') {
+                exams[index] = examData;
+            } else {
+                exams.push(examData);
+            }
+
+            saveToStorage();
+            renderTable();
+            closeModal();
+        }
+
+        // حذف امتحان
+        function deleteExam(index) {
+            if (confirm('هل أنت متأكد من حذف هذا الامتحان بالكامل من اللوحة؟')) {
+                exams.splice(index, 1);
+                saveToStorage();
+                renderTable();
+            }
+        }
+
+        // ميزة النسخ السريع بضغطة زر للواتساب
+        function copyToClipboard(text) {
+            if(text === '#') { alert('لا يوجد رابط منسوخ بعد!'); return; }
+            navigator.clipboard.writeText(text).then(() => {
+                alert('📋 تم نسخ رابط الطلاب بنجاح! يمكنك لصقه الآن في الواتساب.');
+            });
+        }
+
+        // تبديل الوضع الغامق والفاتح ليتوافق مع باقي النظام المطور
+        function toggleTheme() {
+            const currentTheme = document.body.getAttribute('data-theme');
+            if (currentTheme === 'dark') {
+                document.body.removeAttribute('data-theme');
+                localStorage.setItem('theme', 'light');
+            } else {
+                document.body.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // تشغيل التصفية والوضع المحفوظ عند بدء التحميل
+        if(localStorage.getItem('theme') === 'dark') {
+            document.body.setAttribute('data-theme', 'dark');
+        }
+        renderTable();
+    </script>
+    <!-- محقن المعاينة التفاعلية المحمية لقسم الامتحانات الذكية -->
+    <div id="demoAlertModal" style="position:fixed; inset:0; background:rgba(15,23,42,0.82); z-index:999999; display:none; align-items:center; justify-content:center; padding:16px;">
+        <div style="background:#ffffff; color:#0f172a; border-radius:16px; width:100%; max-width:420px; padding:26px; text-align:center; box-shadow:0 20px 40px rgba(0,0,0,0.45); border-top:5px solid #d97706;">
+            <div style="font-size:42px; margin-bottom:8px;">🔒</div>
+            <h3 style="font-size:18px; font-weight:800; color:#1e3a8a; margin-bottom:8px;">هذه نسخة معاينة للمشاهدة فقط</h3>
+            <p style="font-size:13px; color:#475569; line-height:1.6; margin-bottom:18px;">
+                لا يمكن إضافة أو تعديل أو حذف الامتحانات أو فتح الروابط الإدارية في نسخة العرض الأونلاين.<br>
+                للحصول على <strong>النسخة الكاملة العاملة بدون إنترنت 100%</strong> والمحمية بفلاشة الأمان، تواصل معنا الآن:
+            </p>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+                <a href="https://wa.me،%20أرغب%20في%20الحصول%20على%20النسخة%20الكاملة%20من%20منظومة%20STM" target="_blank" style="background:#16a34a; color:#ffffff; text-decoration:none; padding:11px; border-radius:10px; font-size:14px; font-weight:800;">
+                    💬 اطلب النسخة الكاملة عبر واتساب الآن
+                </a>
+                <button onclick="document.getElementById('demoAlertModal').style.display='none'" style="background:#f1f5f9; color:#334155; border:1px solid #cbd5e1; padding:9px; border-radius:10px; font-size:13px; font-weight:700; cursor:pointer; font-family:inherit;">
+                    متابعة تصفح المعاينة
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function initExamsDemoMode() {
+            function showDemoBlocked() {
+                document.getElementById('demoAlertModal').style.display = 'flex';
+            }
+
+            window.addEventListener('load', function() {
+                exams = [
+                    { name: "امتحان شهر أكتوبر - الديناميكا", grade: "الصف الثالث الثانوي", master: "#", share: "#", sheet: "#", result: "#", status: "نشط" },
+                    { name: "اختبار شامل على الفصل الأول - فيزياء", grade: "الصف الثالث الثانوي", master: "#", share: "#", sheet: "#", result: "#", status: "مغلق" },
+                    { name: "تقييم نصف الترم - الجبر والهندسة", grade: "الصف الثاني الثانوي", master: "#", share: "#", sheet: "#", result: "#", status: "نشط" },
+                    { name: "اختبار تأسيسي - أساسيات الرياضيات", grade: "الصف الأول الثانوي", master: "#", share: "#", sheet: "#", result: "#", status: "مؤجل" }
+                ];
+                renderTable();
+            });
+
+            window.saveToStorage = function() {};
+            window.openModal = showDemoBlocked;
+            window.saveExam = showDemoBlocked;
+            window.deleteExam = showDemoBlocked;
+            window.copyToClipboard = showDemoBlocked;
+            window.open = function() { showDemoBlocked(); return null; };
+
+            document.addEventListener('contextmenu', e => e.preventDefault());
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'F12' || (e.ctrlKey && ['u','U','s','S','p','P'].includes(e.key))) {
+                    e.preventDefault();
+                }
+            });
+        })();
+    </script>
+
+</body>
+</html>
