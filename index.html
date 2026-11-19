@@ -231,9 +231,8 @@
             <div class="hero-buttons">
                 <a href="demo/index.html" target="_blank" class="btn-demo-hero">👁️ جرب معاينة حية للبرنامج الآن</a>
                 <a href="#order-now" class="btn-primary-hero">📋 سجل طلب الشراء الآن</a>
-                <a href="https://wa.me،%20أرغب%20في%20الاستفسار%20عن%20منظومة%20إدارة%20السناتر%20التعليمية." target="_blank" class="btn-secondary-hero">💬 استفسار عبر واتساب</a>
-            </div>
-        </div>
+                <button type="button" onclick="openHeroWhatsApp()" class="btn-secondary-hero" style="cursor:pointer; font-family:inherit;">💬 استفسار عبر واتساب</button>
+
     </div>
 
     <section id="features">
@@ -507,6 +506,11 @@
             const waUrl = "https://wa.me" + "/201000009721?text=" + message;
             window.open(waUrl, '_blank');
         }
+                function openHeroWhatsApp() {
+            const msg = encodeURIComponent("السلام عليكم شركة STM، أرغب في الاستفسار عن منظومة إدارة السناتر التعليمية.");
+            window.open("https://wa.me" + "/201000009721?text=" + msg, "_blank");
+        }
+
     </script>
 </body>
 </html>
