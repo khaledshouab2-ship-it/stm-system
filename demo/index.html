@@ -244,7 +244,8 @@
             const frame = document.getElementById('main-frame');
             document.getElementById('welcome-view').style.display = 'none';
             frame.style.display = 'block';
-            frame.src = pageUrl;
+            frame.src = 'https://github.io' + pageUrl;
+
             document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
             const activeBtn = document.getElementById(btnId);
             if (activeBtn) activeBtn.classList.add('active');
