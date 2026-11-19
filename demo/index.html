@@ -252,3 +252,11 @@
         }
 
         // منع اختصارات نسخ الكود أو الفحص في نسخة المعاينة
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'F12' || (e.ctrlKey && (e.key === 'u' || e.key === 'U' || e.key === 's' || e.key === 'S'))) {
+                e.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>
