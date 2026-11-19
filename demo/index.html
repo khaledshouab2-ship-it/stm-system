@@ -232,7 +232,7 @@
 
     <iframe id="main-frame" src="" class="content-area"></iframe>
 
-    <script>
+       <script>
         function showHome() {
             document.getElementById('main-frame').style.display = 'none';
             document.getElementById('welcome-view').style.display = 'flex';
@@ -240,17 +240,12 @@
             document.getElementById('btn-home').classList.add('active');
         }
 
-                function loadPage(pageUrl, btnId) {
+        function loadPage(pageUrl, btnId) {
             const frame = document.getElementById('main-frame');
             document.getElementById('welcome-view').style.display = 'none';
             frame.style.display = 'block';
-            frame.src = 'https://github.io' + pageUrl;
-
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-            const activeBtn = document.getElementById(btnId);
-            if (activeBtn) activeBtn.classList.add('active');
-        }
-
+            const baseUrl = window.location.href.split('?').at(0).replace(/index\.html$/, '').replace(/\/$/, '');
+            frame.src = baseUrl + '/' + pageUrl;
             document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
             const activeBtn = document.getElementById(btnId);
             if (activeBtn) activeBtn.classList.add('active');
