@@ -179,9 +179,10 @@
 
     <div class="demo-banner">
         <span>👁️ وضع المعاينة التفاعلية الحية (للمشاهدة والتصفح فقط)</span>
-        <a href="https://whatsapp.com،%20شاهدت%20معاينة%20منظومة%20STM%20وأرغب%20في%20طلب%20النسخة%20الكاملة" target="_top" class="wa-order-btn">
+        <button onclick="openWhatsAppOrder()" class="wa-order-btn" style="border:none; cursor:pointer; font-family:inherit;">
     💬 اطلب النسخة الكاملة على الفلاشة عبر واتساب
-</a>
+</button>
+
 
     </div>
 
@@ -258,6 +259,12 @@
                 e.preventDefault();
             }
         });
+                   function openWhatsAppOrder() {
+            const phone = "201000009721";
+            const msg = encodeURIComponent("السلام عليكم، شاهدت معاينة منظومة STM وأرغب في طلب النسخة الكاملة");
+            window.open("https://wa.me" + phone + "?text=" + msg, "_blank");
+        }
+
     </script>
 </body>
 </html>
