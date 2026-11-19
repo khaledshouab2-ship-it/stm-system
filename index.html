@@ -129,7 +129,7 @@
         }
 
         .hero-content {
-            max-width: 850px;
+            max-width: 880px;
             margin: 0 auto;
             position: relative;
             z-index: 2;
@@ -156,9 +156,9 @@
 
         .hero p {
             font-size: 18px;
-            color: #cbd5e1;
+            color: #e2e8f0;
             margin-bottom: 35px;
-            max-width: 700px;
+            max-width: 720px;
             margin-left: auto;
             margin-right: auto;
         }
@@ -170,16 +170,39 @@
             flex-wrap: wrap;
         }
 
+        .btn-demo-hero {
+            background: linear-gradient(135deg, #0284c7 0%, #1d4ed8 100%);
+            color: var(--white);
+            padding: 15px 30px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 17px;
+            box-shadow: 0 6px 20px rgba(2, 132, 199, 0.45);
+            border: 1px solid #38bdf8;
+            transition: transform 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-demo-hero:hover {
+            transform: translateY(-2px);
+        }
+
         .btn-primary-hero {
             background: linear-gradient(135deg, var(--stm-green), #15803d);
             color: var(--white);
-            padding: 15px 32px;
+            padding: 15px 30px;
             border-radius: 10px;
             text-decoration: none;
             font-weight: bold;
             font-size: 17px;
             box-shadow: 0 6px 20px rgba(22, 163, 74, 0.35);
             transition: transform 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .btn-primary-hero:hover {
@@ -187,19 +210,22 @@
         }
 
         .btn-secondary-hero {
-            background: rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.14);
             color: var(--white);
             border: 1px solid rgba(255, 255, 255, 0.35);
-            padding: 15px 32px;
+            padding: 15px 30px;
             border-radius: 10px;
             text-decoration: none;
             font-weight: bold;
             font-size: 17px;
             transition: background 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .btn-secondary-hero:hover {
-            background: rgba(255, 255, 255, 0.22);
+            background: rgba(255, 255, 255, 0.24);
         }
 
         /* Section General */
@@ -240,7 +266,7 @@
             padding: 30px 24px;
             border-radius: 16px;
             border: 1px solid var(--border-color);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
             transition: transform 0.25s, box-shadow 0.25s;
         }
 
@@ -335,646 +361,3 @@
         }
 
         .addons-list {
-            padding: 35px 30px;
-        }
-
-        .addons-list h5 {
-            font-size: 19px;
-            margin-bottom: 20px;
-            color: var(--text-dark);
-            border-right: 4px solid var(--stm-blue);
-            padding-right: 12px;
-        }
-
-        .addon-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 20px;
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            margin-bottom: 14px;
-            background: #f8fafc;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .addon-info strong {
-            display: block;
-            font-size: 16px;
-            color: var(--text-dark);
-        }
-
-        .addon-info span {
-            font-size: 14px;
-            color: var(--text-muted);
-        }
-
-        .addon-price {
-            font-size: 18px;
-            font-weight: 800;
-            color: var(--stm-blue);
-            background: #e0f2fe;
-            padding: 6px 14px;
-            border-radius: 8px;
-        }
-
-        /* Order & Payment Section */
-        .order-section-bg {
-            background-color: #f1f5f9;
-            padding: 70px 5%;
-        }
-
-        .order-container {
-            max-width: 1100px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1.1fr 0.9fr;
-            gap: 35px;
-            align-items: start;
-        }
-
-        .card-box {
-            background: var(--white);
-            padding: 35px;
-            border-radius: 18px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
-            border: 1px solid var(--border-color);
-        }
-
-        .card-box h4 {
-            font-size: 22px;
-            margin-bottom: 8px;
-            color: var(--text-dark);
-        }
-
-        .card-box > p {
-            color: var(--text-muted);
-            font-size: 14px;
-            margin-bottom: 25px;
-        }
-
-        .form-group {
-            margin-bottom: 18px;
-        }
-
-        .form-group label {
-            display: block;
-            font-weight: 700;
-            margin-bottom: 6px;
-            font-size: 14px;
-            color: var(--text-dark);
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1.5px solid #cbd5e1;
-            border-radius: 10px;
-            font-size: 15px;
-            font-family: inherit;
-            transition: border-color 0.2s;
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: var(--stm-purple);
-        }
-
-        .checkbox-group {
-            background: #f8fafc;
-            padding: 15px;
-            border-radius: 10px;
-            border: 1px solid var(--border-color);
-            margin-bottom: 20px;
-        }
-
-        .checkbox-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .checkbox-item:last-child {
-            margin-bottom: 0;
-        }
-
-        .checkbox-item input {
-            width: 18px;
-            height: 18px;
-            accent-color: var(--stm-purple);
-        }
-
-        .total-bar {
-            background: #1e293b;
-            color: var(--white);
-            padding: 15px 20px;
-            border-radius: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            font-size: 17px;
-            font-weight: bold;
-        }
-
-        .total-bar span:last-child {
-            color: #4ade80;
-            font-size: 22px;
-        }
-
-        .btn-submit-order {
-            width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, var(--stm-green), #15803d);
-            color: var(--white);
-            border: none;
-            border-radius: 12px;
-            font-size: 17px;
-            font-weight: 800;
-            cursor: pointer;
-            box-shadow: 0 6px 18px rgba(22, 163, 74, 0.3);
-            transition: transform 0.2s;
-        }
-
-        .btn-submit-order:hover {
-            transform: translateY(-2px);
-        }
-
-        /* Payment Methods Box */
-        .payment-option {
-            border: 2px solid var(--border-color);
-            border-radius: 14px;
-            padding: 20px;
-            margin-bottom: 20px;
-            transition: border-color 0.2s;
-        }
-
-        .payment-option.vf-box {
-            border-color: #fecaca;
-            background: #fff5f5;
-        }
-
-        .payment-option.cod-box {
-            border-color: #bbf7d0;
-            background: #f0fdf4;
-        }
-
-        .payment-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 12px;
-        }
-
-        .payment-badge {
-            padding: 5px 12px;
-            border-radius: 6px;
-            font-weight: bold;
-            font-size: 13px;
-            color: var(--white);
-        }
-
-        .badge-vf { background-color: var(--vf-red); }
-        .badge-cod { background-color: var(--stm-green); }
-
-        .vf-number-box {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--white);
-            border: 1.5px dashed var(--vf-red);
-            padding: 12px 16px;
-            border-radius: 10px;
-            margin: 12px 0;
-        }
-
-        .vf-number {
-            font-size: 22px;
-            font-weight: 900;
-            color: var(--vf-red);
-            letter-spacing: 1px;
-            direction: ltr;
-        }
-
-        .btn-copy {
-            background: var(--text-dark);
-            color: var(--white);
-            border: none;
-            padding: 8px 14px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .btn-copy:hover {
-            background: var(--stm-purple);
-        }
-
-        /* Footer */
-        footer {
-            background: #0f172a;
-            color: #cbd5e1;
-            padding: 50px 5% 25px;
-            text-align: center;
-        }
-
-        .footer-content {
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        .footer-logo {
-            font-size: 24px;
-            font-weight: 900;
-            color: var(--white);
-            margin-bottom: 8px;
-        }
-
-        .footer-desc {
-            font-size: 15px;
-            color: #94a3b8;
-            margin-bottom: 25px;
-        }
-
-        .contact-pills {
-            display: flex;
-            justify-content: center;
-            gap: 16px;
-            flex-wrap: wrap;
-            margin-bottom: 30px;
-        }
-
-        .contact-pill {
-            background: rgba(255, 255, 255, 0.08);
-            padding: 10px 20px;
-            border-radius: 50px;
-            color: var(--white);
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 600;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            direction: ltr;
-        }
-
-        .copyright {
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            padding-top: 20px;
-            font-size: 13px;
-            color: #64748b;
-        }
-
-        /* Toast Notification */
-        .toast {
-            position: fixed;
-            bottom: 25px;
-            left: 25px;
-            background: #0f172a;
-            color: var(--white);
-            padding: 14px 24px;
-            border-radius: 10px;
-            font-weight: bold;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
-            display: none;
-            z-index: 2000;
-            border-right: 5px solid #4ade80;
-        }
-
-        @media (max-width: 850px) {
-            .order-container {
-                grid-template-columns: 1fr;
-            }
-            .nav-links a:not(.btn-cta-nav) {
-                display: none;
-            }
-            .hero h2 {
-                font-size: 28px;
-            }
-        }
-    </style>
-</head>
-<body>
-
-    <!-- Header -->
-    <header>
-        <div class="nav-container">
-            <div class="brand">
-                <div class="logo-badge">STM</div>
-                <div class="brand-text">
-                    <h1>STM للبرمجيات</h1>
-                    <span>نظم إدارة المنشآت الذكية</span>
-                </div>
-            </div>
-            <nav class="nav-links">
-                <a href="#features">مميزات المنظومة</a>
-                <a href="#pricing">الباقات والأسعار</a>
-                <a href="#order-now" class="btn-cta-nav">🚀 اطلب نسختك الآن</a>
-            </nav>
-        </div>
-    </header>
-
-    <!-- Hero Section -->
-    <div class="hero">
-        <div class="hero-content">
-            <div class="hero-tag">🛡️ تملك مدى الحياة • بدون إنترنت • حماية فيزيائية بالـ USB</div>
-            <h2>أدِر سنترك التعليمي بذكاء وأمان تام مع منظومة STM المتكاملة</h2>
-            <p>نظام إدارة شامل يجمع بين الحضور التلقائي، الشئون المالية المشفرة، والامتحانات الإلكترونية الذكية على وحدة USB محمية مخصصة لمنشأتك وحدك.</p>
-                        <div class="hero-buttons">
-                <a href="demo/index.html" target="_blank" style="background: linear-gradient(135deg, #0284c7 0%, #1e40af 100%); color: #ffffff; padding: 14px 26px; border-radius: 10px; font-weight: 800; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 6px 18px rgba(2,132,199,0.4); border: 1px solid #38bdf8;">👁️ جرب معاينة حية للبرنامج الآن</a>
-                <a href="#order-now" class="btn-primary-hero">📋 سجل طلب الشراء الآن</a>
-                <a href="https://wa.me/201000009721?text=السلام%20عليكم%20شركة%20STM،%20أرغب%20في%20الاستفسار%20عن%20منظومة%20إدارة%20السناتر%20التعليمية." target="_blank" class="btn-secondary-hero">💬 استفسار عبر واتساب</a>
-            </div>
-
-    </div>
-
-    <!-- Features Section -->
-    <section id="features">
-        <div class="section-header">
-            <h3>لماذا يختار أصحاب السناتر منظومة STM؟</h3>
-            <p>صُممت المنظومة لتقضي تماماً على الأخطاء الإدارية، التلاعب المالي، وبطء تسجيل الطلاب في أوقات الذروة.</p>
-        </div>
-
-        <div class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon icon-blue">📊</div>
-              <h4>الحضور والغياب الذكي</h4>
-                
-                <p>تسجيل دخول المئات من الطلاب في ثوانٍ معدودة بالباركود أو الكود، مع فرز فوري للغياب وتقارير التزام دقيقة لكل مجموعة.</p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon icon-green">💰</div>
-                <h4>الشئون المالية المحمية</h4>
-                <p>إدارة كاملة للإيرادات، الاشتراكات، والمصروفات مع نظام صلاحيات مشفر يفصل صلاحيات الموظفين عن إعدادات الإدارة العليا.</p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon icon-purple">📝</div>
-                <h4>الامتحانات الإلكترونية الذكية</h4>
-                <p>لوحة تحكم متكاملة لإدارة الامتحانات، التصحيح الآلي الفوري، واستخراج كشوف الدرجات والغائبين بضغطة زر واحدة.</p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon icon-amber">🔐</div>
-                <h4>تشفير وحماية فيزيائية (USB)</h4>
-                <p>يعمل النظام من فلاشة أصلية مقسمة ومشفرة بالرقم التسلسلي المصنعي لحماية قاعدة بيانات سنترك من الفيروسات أو النسخ غير المصرح به.</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Pricing Section -->
-    <section id="pricing">
-        <div class="section-header">
-            <h3>باقات الاستثمار والخدمات الإضافية</h3>
-            <p>استثمار لمرة واحدة يضمن لك امتلاك المنظومة بالكامل دون أي أعباء أو اشتراكات شهرية متكررة.</p>
-        </div>
-
-        <div class="pricing-wrapper">
-            <div class="main-package">
-                <span class="package-badge">الترخيص الأساسي الشامل</span>
-                <h4>المنظومة المتكاملة لإدارة السناتر التعليمية (STM System)</h4>
-                <div class="price-tag">35,000 <span>جنيه مصري / تدفع مرة واحدة</span></div>
-                <div class="package-perks">
-                    <span>✅ وحدة USB أصلية مشفرة بالسيريال</span>
-                    <span>✅ تفعيل كافة الأقسام الأربعة</span>
-                    <span>✅ تدريب وتهيئة أولية للنظام</span>
-                </div>
-            </div>
-
-            <div class="addons-list">
-                <h5>خدمات اختيارية حسب احتياج السنتر:</h5>
-
-                <div class="addon-item">
-                    <div class="addon-info">
-                        <strong>📥 ملء البيانات الأساسية للطلاب (قسم الحضور والغياب)</strong>
-                        <span>إدخال وتكويد قوائم طلاب السنتر بالكامل وتجهيزها للعمل الفوري في نظام الحضور.</span>
-                    </div>
-                    <div class="addon-price">2,500 جنيه</div>
-                </div>
-
-                <div class="addon-item">
-                    <div class="addon-info">
-                        <strong>💳 ملء البيانات الأساسية للطلاب (قسم الشئون المالية)</strong>
-                        <span>تهيئة حسابات الطلاب والاشتراكات والمديونيات في قاعدة البيانات المالية بدقة تامة.</span>
-                    </div>
-                    <div class="addon-price">2,500 جنيه</div>
-                </div>
-
-                <div class="addon-item">
-                    <div class="addon-info">
-                        <strong>🌐 تنسيق وإدارة واستضافة الامتحانات أونلاين</strong>
-                        <span>تجهيز النماذج الإلكترونية، ربط قواعد التصحيح الآلي، وإدارة كشوف النتائج للسنتر.</span>
-                    </div>
-                    <div class="addon-price">10,000 جنيه</div>
-                </div>
-
-                <div class="addon-item">
-                    <div class="addon-info">
-                        <strong>🔄 استبدال وحدة الفلاشة التالفة (عند الحاجة)</strong>
-                        <span>إصدار وحدة USB بديلة مشفرة بنفس ترخيص المنشأة ونقل بيئة العمل بأمان.</span>
-                    </div>
-                    <div class="addon-price">2,000 جنيه</div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Order & Payment Section -->
-    <div class="order-section-bg" id="order-now">
-        <div class="section-header">
-            <h3>طلب الشراء وتأكيد الدفع الإلكتروني</h3>
-            <p>سجّل بيانات سنترك واختر طريقة الدفع المناسبة، وسيتواصل معك فريق المبيعات والدعم الفني فوراً.</p>
-        </div>
-
-        <div class="order-container">
-            <!-- Order Form -->
-            <div class="card-box">
-                <h4>📋 نموذج حجز وطلب المنظومة</h4>
-                <p>املأ البيانات التالية ليتم تجهيز طلبك وإرساله مباشرة إلى إدارة المبيعات.</p>
-
-                <form id="orderForm" onsubmit="submitOrder(event)">
-                    <div class="form-group">
-                        <label>الاسم بالكامل (الأستاذ / مدير السنتر) *</label>
-                        <input type="text" id="clientName" class="form-control" required placeholder="مثال: أ. محمد محمود">
-                    </div>
-
-                    <div class="form-group">
-                        <label>اسم السنتر والمحافظة *</label>
-                        <input type="text" id="centerName" class="form-control" required placeholder="مثال: سنتر النخبة التعليمي - القاهرة">
-                    </div>
-
-                    <div class="form-group">
-                        <label>رقم الهاتف (يفضل أن يدعم واتساب) *</label>
-                        <input type="tel" id="clientPhone" class="form-control" required placeholder="01xxxxxxxxx">
-                    </div>
-
-                    <div class="form-group">
-                        <label>الباقة والخدمات المطلوبة:</label>
-                        <div class="checkbox-group">
-                            <label class="checkbox-item">
-                                <input type="checkbox" checked disabled>
-                                <span>البرنامج الأساسي الشامل (35,000 ج.م) - أساسي</span>
-                            </label>
-                            <label class="checkbox-item">
-                                <input type="checkbox" class="addon-check" data-name="ملء بيانات الحضور والغياب" data-price="2500" onchange="calculateTotal()">
-                                <span>إضافة: ملء بيانات الحضور والغياب (+2,500 ج.م)</span>
-                            </label>
-                            <label class="checkbox-item">
-                                <input type="checkbox" class="addon-check" data-name="ملء بيانات الشئون المالية" data-price="2500" onchange="calculateTotal()">
-                                <span>إضافة: ملء بيانات الشئون المالية (+2,500 ج.م)</span>
-                            </label>
-                            <label class="checkbox-item">
-                                <input type="checkbox" class="addon-check" data-name="تنسيق وإدارة الامتحانات أونلاين" data-price="10000" onchange="calculateTotal()">
-                                <span>إضافة: تنسيق وإدارة الامتحانات أونلاين (+10,000 ج.م)</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>طريقة الدفع المفضلة *</label>
-                        <select id="paymentMethod" class="form-control" onchange="togglePaymentHighlight()">
-                            <option value="فودافون كاش (Vodafone Cash)">📱 تحويل إلكتروني عبر فودافون كاش (Vodafone Cash)</option>
-                            <option value="الدفع نقداً عند الاستلام (COD)">🚚 الدفع نقداً عند الاستلام والمعاينة</option>
-                        </select>
-                    </div>
-
-                    <div class="total-bar">
-                        <span>إجمالي الاستثمار المطلوب:</span>
-                        <span id="totalDisplay">35,000 ج.م</span>
-                    </div>
-
-                    <button type="submit" class="btn-submit-order">✅ تأكيد الطلب وإرساله عبر واتساب</button>
-                </form>
-            </div>
-
-            <!-- Payment Instructions -->
-            <div class="card-box">
-                <h4>💳 طرق الدفع المعتمدة والآمنة</h4>
-                <p>نوفر لك طريقتين مرنتين لإتمام التعاقد واستلام نسختك الرسمية المختومة.</p>
-
-                <!-- Vodafone Cash -->
-                <div class="payment-option vf-box" id="vfCard">
-                    <div class="payment-header">
-                        <span class="payment-badge badge-vf">فودافون كاش</span>
-                        <strong>التحويل الإلكتروني السريع</strong>
-                    </div>
-                    <p style="font-size: 14px; color: #7f1d1d;">يمكنك تحويل مبلغ التعاقد أو جدية الحجز على رقم محفظة الشركة الرسمي التالي:</p>
-                    <div class="vf-number-box">
-                        <span class="vf-number">01000009721</span>
-                        <button type="button" class="btn-copy" onclick="copyVfNumber()">📋 نسخ الرقم</button>
-                    </div>
-                    <p style="font-size: 13px; color: #991b1b;">* بعد التحويل، يُرجى إرسال صورة إيصال التحويل عبر الواتساب لتفعيل الترخيص وإرسال الفلاشة فوراً.</p>
-                </div>
-
-                <!-- Cash on Delivery -->
-                <div class="payment-option cod-box" id="codCard">
-                    <div class="payment-header">
-                        <span class="payment-badge badge-cod">الدفع عند الاستلام</span>
-                        <strong>التسليم المباشر لمقر السنتر</strong>
-                    </div>
-                    <p style="font-size: 14px; color: #14532d; margin-bottom: 8px;">يصلك مندوب الشركة أو شركة الشحن المعتمدة حاملاً:</p>
-                    <ul style="font-size: 13.5px; color: #166534; padding-right: 18px; line-height: 1.8;">
-                        <li>وحدة الـ USB الأصلية مشفرة ومختومة بشعار STM.</li>
-                        <li>بطاقة بيانات التشغيل السرية (VIP Security Card).</li>
-                        <li>فاتورة البيع الرسمية المعتمدة والمختومة.</li>
-                    </ul>
-                </div>
-
-                <div style="background: #f8fafc; padding: 15px; border-radius: 10px; border: 1px solid var(--border-color); text-align: center; font-size: 13.5px; color: var(--text-muted);">
-                    📞 للاستفسارات المباشرة وطلب المعاينة:<br>
-                    <strong style="color: var(--text-dark); font-size: 16px; direction: ltr; display: inline-block; margin-top: 4px;">00201000009721</strong>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Footer -->
-    <footer>
-        <div class="footer-content">
-            <div class="footer-logo">STM للبرمجيات ونظم إدارة المنشآت الذكية</div>
-            <div class="footer-desc">حلول برمجية ذكية، آمنة، ومصممة خصيصاً لرفع كفاءة المؤسسات التعليمية والسناتر.</div>
-            <div class="contact-pills">
-                <a href="tel:+201000009721" class="contact-pill">📞 00201000009721</a>
-                <a href="https://wa.me/201000009721" target="_blank" class="contact-pill">💬 WhatsApp: 01000009721</a>
-                <a href="mailto:khaledshouab2@gmail.com" class="contact-pill">✉️ khaledshouab2@gmail.com</a>
-            </div>
-            <div class="copyright">
-                جميع الحقوق محفوظة © 2026 شركة STM للبرمجيات ونظم إدارة المنشآت الذكية.
-            </div>
-        </div>
-    </footer>
-
-    <!-- Toast Notification -->
-    <div id="toast" class="toast">📋 تم نسخ رقم محفظة فودافون كاش بنجاح!</div>
-
-    <script>
-        function calculateTotal() {
-            let total = 35000;
-            const checks = document.querySelectorAll('.addon-check:checked');
-            checks.forEach(chk => {
-                total += parseInt(chk.getAttribute('data-price'));
-            });
-            document.getElementById('totalDisplay').innerText = total.toLocaleString('en-US') + ' ج.م';
-            return total;
-        }
-
-        function copyVfNumber() {
-            navigator.clipboard.writeText('01000009721').then(() => {
-                const toast = document.getElementById('toast');
-                toast.style.display = 'block';
-                setTimeout(() => {
-                    toast.style.display = 'none';
-                }, 3000);
-            });
-        }
-
-        function togglePaymentHighlight() {
-            const method = document.getElementById('paymentMethod').value;
-            const vfCard = document.getElementById('vfCard');
-            const codCard = document.getElementById('codCard');
-            if (method.includes('فودافون')) {
-                vfCard.style.boxShadow = '0 0 0 3px rgba(230, 0, 0, 0.25)';
-                codCard.style.boxShadow = 'none';
-            } else {
-                codCard.style.boxShadow = '0 0 0 3px rgba(22, 163, 74, 0.25)';
-                vfCard.style.boxShadow = 'none';
-            }
-        }
-
-        function submitOrder(e) {
-            e.preventDefault();
-            const name = document.getElementById('clientName').value.trim();
-            const center = document.getElementById('centerName').value.trim();
-            const phone = document.getElementById('clientPhone').value.trim();
-            const payment = document.getElementById('paymentMethod').value;
-            const total = calculateTotal().toLocaleString('en-US');
-
-            let selectedAddons = [];
-            document.querySelectorAll('.addon-check:checked').forEach(chk => {
-                selectedAddons.push('• ' + chk.getAttribute('data-name') + ' (' + parseInt(chk.getAttribute('data-price')).toLocaleString('en-US') + ' ج.م)');
-            });
-
-            const addonsText = selectedAddons.length > 0 ? '\n*الخدمات الإضافية:*\n' + selectedAddons.join('\n') : '\n*الخدمات الإضافية:* لا يوجد (البرنامج الأساسي فقط)';
-
-            const message = `السلام عليكم شركة *STM للبرمجيات*،%0Aأرغب في طلب شراء *منظومة إدارة السناتر التعليمية الذكية*:%0A%0A` +
-                `👤 *الاسم:* ${encodeURIComponent(name)}%0A` +
-                `🏫 *السنتر والمحافظة:* ${encodeURIComponent(center)}%0A` +
-                `📞 *رقم الهاتف:* ${encodeURIComponent(phone)}%0A` +
-                `📦 *الباقة:* البرنامج الأساسي (35,000 ج.م)` +
-                `${encodeURIComponent(addonsText)}%0A` +
-                `💰 *الإجمالي:* ${encodeURIComponent(total)} ج.م%0A` +
-                `💳 *طريقة الدفع:* ${encodeURIComponent(payment)}%0A%0A` +
-                `برجاء التواصل لتأكيد التفاصيل وإتمام التسليم.`;
-
-            const waUrl = `https://wa.me/201000009721?text=${message}`;
-            window.open(waUrl, '_blank');
-        }
-    </script>
-</body>
-</html>
